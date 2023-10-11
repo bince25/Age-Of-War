@@ -4416,7 +4416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnSide: 0
-  clubmanPrefab: {fileID: 6479717708429415748, guid: d12edd38ef865044b87da994f47c751a, type: 3}
+  clubmanPrefab: {fileID: 5476588779887842500, guid: 5d5a01dc964ecb64db11d6826104601c, type: 3}
   leftSpawnPoint: {fileID: 1520876161}
   rightSpawnPoint: {fileID: 1723804754}
 --- !u!4 &783853875

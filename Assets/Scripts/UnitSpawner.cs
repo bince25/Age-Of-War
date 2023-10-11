@@ -39,11 +39,13 @@ public class UnitSpawner : MonoBehaviour
         if (CheckSpawnPoint())
         {
             GameObject clubman = Instantiate(entityPrefab);
-            clubman.GetComponent<SPUM_Prefabs>().PlayAnimation("attack_normal");
-            clubman.GetComponent<SPUM_Prefabs>().PlayAnimation("idle");
-            clubman.GetComponent<SPUM_Prefabs>().PlayAnimation("run");
             clubman.AddComponent<BoxCollider2D>();
             clubman.transform.position = spawnLocation;
+
+            if (spawnSide == SpawnSide.Left)
+            {
+                Flip(clubman);
+            }
         }
     }
     public bool CheckSpawnPoint()
@@ -56,6 +58,19 @@ public class UnitSpawner : MonoBehaviour
         {
             return true;
         }
+    }
+
+    public void Flip(GameObject unit)
+    {
+
+        // Get the local scale
+        Vector3 localScale = unit.transform.localScale;
+
+        // Flip the x-component (horizontal mirroring)
+        localScale.x *= -1;
+
+        // Apply the adjusted local scale
+        unit.transform.localScale = localScale;
     }
 
 }

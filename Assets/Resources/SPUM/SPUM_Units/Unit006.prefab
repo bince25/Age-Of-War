@@ -1765,6 +1765,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5385126039577393803}
   - component: {fileID: 2932272099583988101}
+  - component: {fileID: -2104511397174540761}
   m_Layer: 5
   m_Name: Unit006
   m_TagString: Untagged
@@ -1781,7 +1782,7 @@ RectTransform:
   m_GameObject: {fileID: 4502671851365142085}
   m_LocalRotation: {x: -0, y: 0.008726557, z: -0, w: 0.9999619}
   m_LocalPosition: {x: 0, y: 0, z: 0.00015256465}
-  m_LocalScale: {x: 400, y: 400, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2899201389214222070}
@@ -1814,6 +1815,19 @@ MonoBehaviour:
   UnitTypeChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-2104511397174540761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4502671851365142085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4dc9eac4b0e434a811d8a458a607fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitObject: {fileID: 4502671851365142085}
 --- !u!1 &4565657207170712839
 GameObject:
   m_ObjectHideFlags: 0

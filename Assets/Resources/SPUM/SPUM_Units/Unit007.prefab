@@ -1058,6 +1058,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4005225925772449021}
   - component: {fileID: 4380275453007292266}
+  - component: {fileID: -5434744301585358288}
   m_Layer: 5
   m_Name: Unit007
   m_TagString: Untagged
@@ -1074,7 +1075,7 @@ RectTransform:
   m_GameObject: {fileID: 2624420317354950204}
   m_LocalRotation: {x: -0, y: 0.008726557, z: -0, w: 0.9999619}
   m_LocalPosition: {x: 0, y: 0, z: 0.00015256465}
-  m_LocalScale: {x: 400, y: 400, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7075631449401716171}
@@ -1107,6 +1108,19 @@ MonoBehaviour:
   UnitTypeChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-5434744301585358288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624420317354950204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4dc9eac4b0e434a811d8a458a607fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitObject: {fileID: 2624420317354950204}
 --- !u!1 &2690935645920132645
 GameObject:
   m_ObjectHideFlags: 0
