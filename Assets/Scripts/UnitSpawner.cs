@@ -39,6 +39,9 @@ public class UnitSpawner : MonoBehaviour
         if (CheckSpawnPoint())
         {
             GameObject clubman = Instantiate(entityPrefab);
+            clubman.GetComponent<SPUM_Prefabs>().PlayAnimation("attack_normal");
+            clubman.GetComponent<SPUM_Prefabs>().PlayAnimation("idle");
+            clubman.GetComponent<SPUM_Prefabs>().PlayAnimation("run");
             clubman.AddComponent<BoxCollider2D>();
             clubman.transform.position = spawnLocation;
         }
