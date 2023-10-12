@@ -4932,6 +4932,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -4800455721087150307, guid: d12edd38ef865044b87da994f47c751a, type: 3}
+      propertyPath: defaultAttackType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3814260202345565917, guid: d12edd38ef865044b87da994f47c751a, type: 3}
       propertyPath: UnitTypeChanged.m_PersistentCalls.m_Calls.Array.size
       value: 0
