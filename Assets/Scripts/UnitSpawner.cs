@@ -78,11 +78,16 @@ public class UnitSpawner : MonoBehaviour
         // Get the local scale
         Vector3 localScale = unit.transform.localScale;
 
+        Transform firstChild = unit.transform.GetChild(0).GetChild(0);
+        Vector3 firstChildLocalScale = firstChild.localScale;
+
+
         // Flip the x-component (horizontal mirroring)
         localScale.x *= -1;
-
+        firstChildLocalScale.x *= -1;
         // Apply the adjusted local scale
         unit.transform.localScale = localScale;
+        firstChild.localScale = firstChildLocalScale;
     }
 
 }
