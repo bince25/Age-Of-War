@@ -5,6 +5,9 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
     public LayerMask defaultLayer;
+    public int maxHealth = 100;
+    public int currentHealth;
+    public HealthBar healthBar;
 
     [SerializeField]
     private GameObject unitObject;
@@ -58,11 +61,18 @@ public class UnitController : MonoBehaviour
             _collider.isTrigger = true;
         }
 
+        currentHealth = maxHealth;
+        healthBar.SetMaxHealth(maxHealth);
+
         Run();
     }
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TakeDamage(20);
+        }
         switch (currentState)
         {
             case UnitState.Walking:
@@ -78,6 +88,12 @@ public class UnitController : MonoBehaviour
 
                 break;
         }
+    }
+
+    void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        healthBar.SetHealth(currentHealth);
     }
 
     void Move()
