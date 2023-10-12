@@ -2235,6 +2235,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitObject: {fileID: 5476588779887842500}
   defaultAttackType: 1
+  enemyTag: Enemy
+  detectionRange: 2
+  isFacingRight: 1
 --- !u!1 &5573605387930588343
 GameObject:
   m_ObjectHideFlags: 0

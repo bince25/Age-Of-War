@@ -39,12 +39,24 @@ public class UnitSpawner : MonoBehaviour
         if (CheckSpawnPoint())
         {
             GameObject clubman = Instantiate(entityPrefab);
-            clubman.AddComponent<BoxCollider2D>();
+            BoxCollider2D collider = clubman.AddComponent<BoxCollider2D>();
+            collider.size = new Vector2(0.6f, 1.5f);
+            collider.isTrigger = true;
+
+            Rigidbody2D rigidbody = clubman.AddComponent<Rigidbody2D>();
+            rigidbody.bodyType = RigidbodyType2D.Kinematic;
             clubman.transform.position = spawnLocation;
 
             if (spawnSide == SpawnSide.Left)
             {
                 Flip(clubman);
+                clubman.GetComponent<UnitController>().isFacingRight = true;
+                clubman.gameObject.tag = "LeftSide";
+            }
+            else
+            {
+                clubman.GetComponent<UnitController>().isFacingRight = false;
+                clubman.gameObject.tag = "RightSide";
             }
         }
     }
