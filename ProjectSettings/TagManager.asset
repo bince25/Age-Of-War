@@ -7,6 +7,8 @@ TagManager:
   - GameManager
   - LeftSide
   - RightSide
+  - Left
+  - Right
   layers:
   - Default
   - TransparentFX
