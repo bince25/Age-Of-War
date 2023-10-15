@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class UnitController : MonoBehaviour
@@ -19,6 +20,11 @@ public class UnitController : MonoBehaviour
     private AttackType defaultAttackType;
     [SerializeField]
     private string oppositeTag = "RightSide";
+
+    [SerializeField]
+
+    private string oppositeCastleTag = "RightCastle";
+
     [SerializeField]
     private float detectionRange = 2f;
 
@@ -46,8 +52,16 @@ public class UnitController : MonoBehaviour
 
     private void Start()
     {
-        if (isFacingRight) oppositeTag = SpawnSide.Right.ToString();
-        else oppositeTag = SpawnSide.Left.ToString();
+        if (isFacingRight)
+        {
+            oppositeTag = SpawnSide.Right.ToString();
+            oppositeCastleTag = SpawnSide.RightCastle.ToString();
+        }
+        else
+        {
+            oppositeTag = SpawnSide.Left.ToString();
+            oppositeCastleTag = SpawnSide.LeftCastle.ToString();
+        }
 
         unitSpumController = unitObject.GetComponent<SPUM_Prefabs>();
         attackTypeToAnimationName = new Dictionary<AttackType, string>()
@@ -147,9 +161,14 @@ public class UnitController : MonoBehaviour
         if (target == null || !target.activeInHierarchy || currentHealth <= 0) return; // Check if target is available and if the unit's health is above zero
 
         UnitController targetController = target.GetComponent<UnitController>();
+        Castle castle = target.GetComponent<Castle>();
         if (targetController != null)
         {
             targetController.TakeDamage(attackDamage);
+        }
+        else if (castle != null)
+        {
+            castle.TakeDamage(attackDamage);
         }
     }
 
@@ -192,21 +211,21 @@ public class UnitController : MonoBehaviour
             currentState = UnitState.Idle;
             unitSpumController.PlayAnimation("idle");
 
-            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange + 1.3f);
-            foreach (var hitCollider in hitColliders)
+            //return;
+        }
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange + 1.3f);
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.gameObject.tag == oppositeTag || hitCollider.gameObject.tag == oppositeCastleTag)
             {
-                if (hitCollider.gameObject.tag == oppositeTag)
-                {
-                    // Handle enemy behavior
-                    isAnimating = true;
-                    isStopped = true;  // Stop the unit when attacking
-                    currentState = UnitState.Attacking;
-                    currentTarget = hitCollider.gameObject;
-                    RunAnimation(defaultAttackTypeAnimationName);
-                    return; // Exit after handling the first enemy detected
-                }
+                // Handle enemy behavior
+                isAnimating = true;
+                isStopped = true;  // Stop the unit when attacking
+                currentState = UnitState.Attacking;
+                currentTarget = hitCollider.gameObject;
+                RunAnimation(defaultAttackTypeAnimationName);
+                return; // Exit after handling the first enemy detected
             }
-            return;
         }
 
 

@@ -36,7 +36,7 @@ public class UnitSpawner : MonoBehaviour
 
     public void SpawnEntity(GameObject entityPrefab)
     {
-        if (CheckSpawnPoint())
+        if (true)
         {
             GameObject clubman = Instantiate(entityPrefab);
             BoxCollider2D collider = clubman.AddComponent<BoxCollider2D>();
@@ -62,8 +62,14 @@ public class UnitSpawner : MonoBehaviour
     }
     public bool CheckSpawnPoint()
     {
-        if (Physics2D.OverlapCircle(spawnCheckLocation, 1f) && Physics2D.OverlapCircle(spawnLocation, 1f))
+        Collider2D collider1 = Physics2D.OverlapCircle(spawnCheckLocation, 1f);
+        Collider2D collider2 = Physics2D.OverlapCircle(spawnLocation, 1f);
+        if (collider1 && collider2)
         {
+            if (collider1.gameObject.tag != "LeftCastle" || collider2.gameObject.tag == "RightCastle")
+            {
+                return true;
+            }
             return false;
         }
         else
@@ -95,6 +101,10 @@ public class UnitSpawner : MonoBehaviour
 public enum SpawnSide
 {
     Left,
-    Right
+    Right,
+
+    RightCastle,
+
+    LeftCastle
 }
 
