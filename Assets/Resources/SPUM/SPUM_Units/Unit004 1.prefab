@@ -1971,6 +1971,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4598349771964846705}
   - component: {fileID: 6913322899521371502}
+  - component: {fileID: 1659918870843072856}
   m_Layer: 5
   m_Name: Unit004 1
   m_TagString: Untagged
@@ -2021,6 +2022,33 @@ MonoBehaviour:
   UnitTypeChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1659918870843072856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4542107571249477178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4dc9eac4b0e434a811d8a458a607fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  maxHealth: 250
+  attackDamage: 14
+  currentHealth: 0
+  healthBar: {fileID: 9085685733708020955}
+  unitObject: {fileID: 2502067789977647696, guid: d2bc51510b09599449df9ff0fecbc934, type: 3}
+  defaultAttackType: 0
+  oppositeTag: RightSide
+  oppositeCastleTag: RightCastle
+  detectionRange: 2
+  attackCooldown: 1
+  speed: 4
+  isFacingRight: 1
 --- !u!1 &4609678879922271157
 GameObject:
   m_ObjectHideFlags: 0
@@ -4077,3 +4105,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6987909962450576119, guid: ab42f7c75918e87439a5af2c2da4c244, type: 3}
   m_PrefabInstance: {fileID: 4345578237423320019}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9085685733708020955 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4780658327510632200, guid: ab42f7c75918e87439a5af2c2da4c244, type: 3}
+  m_PrefabInstance: {fileID: 4345578237423320019}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0332fa27f1590c840978de08b2b95515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

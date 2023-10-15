@@ -2864,6 +2864,7 @@ GameObject:
   m_Component:
   - component: {fileID: 143274533608754427}
   - component: {fileID: 5597366411706517218}
+  - component: {fileID: 4726175905361176809}
   m_Layer: 5
   m_Name: Unit011
   m_TagString: Untagged
@@ -2914,6 +2915,33 @@ MonoBehaviour:
   UnitTypeChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4726175905361176809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4921601075037218600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4dc9eac4b0e434a811d8a458a607fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  maxHealth: 250
+  attackDamage: 14
+  currentHealth: 0
+  healthBar: {fileID: 561170302841816810}
+  unitObject: {fileID: 2502067789977647696, guid: d2bc51510b09599449df9ff0fecbc934, type: 3}
+  defaultAttackType: 0
+  oppositeTag: RightSide
+  oppositeCastleTag: RightCastle
+  detectionRange: 2
+  attackCooldown: 1
+  speed: 4
+  isFacingRight: 1
 --- !u!1 &5063207846143533143
 GameObject:
   m_ObjectHideFlags: 0
@@ -5997,6 +6025,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ab42f7c75918e87439a5af2c2da4c244, type: 3}
+--- !u!114 &561170302841816810 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4780658327510632200, guid: ab42f7c75918e87439a5af2c2da4c244, type: 3}
+  m_PrefabInstance: {fileID: 5013036357193974242}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0332fa27f1590c840978de08b2b95515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &2696505090913461013 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6987909962450576119, guid: ab42f7c75918e87439a5af2c2da4c244, type: 3}

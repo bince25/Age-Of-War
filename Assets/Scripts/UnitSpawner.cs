@@ -4,8 +4,12 @@ public class UnitSpawner : MonoBehaviour
 {
     [SerializeField]
     private SpawnSide spawnSide;
+
+    [Space(10)]
     [SerializeField]
-    private GameObject clubmanPrefab;
+    private GameObject clubmanPrefab, slingerPrefab, stoneTankPrefab;
+
+    [Space(10)]
 
     [SerializeField]
     private GameObject leftSpawnPoint;
@@ -32,6 +36,16 @@ public class UnitSpawner : MonoBehaviour
     public void SpawnClubman()
     {
         SpawnEntity(clubmanPrefab);
+    }
+
+    public void SpawnSlinger()
+    {
+        SpawnEntity(slingerPrefab);
+    }
+
+    public void SpawnStoneTank()
+    {
+        SpawnEntity(stoneTankPrefab);
     }
 
     public void SpawnEntity(GameObject entityPrefab)
