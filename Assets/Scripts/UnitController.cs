@@ -90,10 +90,6 @@ public class UnitController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            TakeDamage(20);
-        }
         switch (currentState)
         {
             case UnitState.Walking:
