@@ -346,6 +346,8 @@ public class UnitController : MonoBehaviour
     private void Death()
     {
         unitSpumController.PlayAnimation("death");
+        ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
+        resourceController.UnitDied(gameObject.tag, gameObject.name);
         Destroy(this.gameObject, 0.5f); // Destroy the unit after 1 second
     }
 

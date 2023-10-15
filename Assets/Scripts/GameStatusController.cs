@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameStatusController : MonoBehaviour
 {
@@ -10,6 +12,11 @@ public class GameStatusController : MonoBehaviour
     private GameObject gameOverPanel;
     [SerializeField]
     private GameObject leftWinText, rightWinText;
+
+    private TextMeshProUGUI ageGoalText;
+    [SerializeField]
+    private Ages leftAge, rightAge;
+
     void Start()
     {
         leftCastle = GameObject.FindGameObjectWithTag("LeftCastle");
@@ -40,5 +47,16 @@ public class GameStatusController : MonoBehaviour
     void RestartGame()
     {
         Application.LoadLevel(Application.loadedLevel);
+    }
+
+
+    public enum Ages
+    {
+        Stone,
+        Iron,
+        Medieval,
+        Renaissance,
+        Modern,
+        Future
     }
 }
