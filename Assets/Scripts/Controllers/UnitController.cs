@@ -90,6 +90,11 @@ public class UnitController : MonoBehaviour
 
     private void Update()
     {
+        if (currentHealth < 0)
+        {
+            currentHealth = 0;
+            healthBar.SetHealth(currentHealth);
+        }
         switch (currentState)
         {
             case UnitState.Walking:
@@ -363,22 +368,4 @@ public class UnitController : MonoBehaviour
         return 0f; // Return 0 if no animation with that name is found.
     }
 
-}
-
-public enum AttackType
-{
-    AttackNormal,
-    AttackBow,
-    AttackMagic,
-    SkillBow,
-    SkillMagic,
-    SkillNormal,
-
-}
-
-public enum UnitState
-{
-    Walking,
-    Attacking,
-    Idle
 }

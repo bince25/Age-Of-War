@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-public class GameStatusController : MonoBehaviour
+public class GameStateManager : MonoBehaviour
 {
     private GameObject leftCastle, rightCastle;
     [SerializeField]
@@ -47,16 +47,5 @@ public class GameStatusController : MonoBehaviour
     void RestartGame()
     {
         Application.LoadLevel(Application.loadedLevel);
-    }
-
-
-    public enum Ages
-    {
-        Stone,
-        Iron,
-        Medieval,
-        Renaissance,
-        Modern,
-        Future
     }
 }

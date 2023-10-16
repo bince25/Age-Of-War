@@ -111,14 +111,3 @@ public class UnitSpawner : MonoBehaviour
     }
 
 }
-
-public enum SpawnSide
-{
-    Left,
-    Right,
-
-    RightCastle,
-
-    LeftCastle
-}
-
