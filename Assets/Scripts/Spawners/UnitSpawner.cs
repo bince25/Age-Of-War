@@ -4,10 +4,13 @@ public class UnitSpawner : MonoBehaviour
 {
     [SerializeField]
     private SpawnSide spawnSide;
+    private ResourceController resourceController;
 
     [Space(10)]
     [SerializeField]
     private GameObject clubmanPrefab, slingerPrefab, stoneTankPrefab;
+
+    public bool canSpawnMeleeUnit, canSpawnRangedUnit, canSpawnTankUnit, canSpawnMountedUnit, canSpawnSiegeUnit;
 
     [Space(10)]
 
@@ -21,6 +24,12 @@ public class UnitSpawner : MonoBehaviour
 
     void Start()
     {
+        resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
+        canSpawnMeleeUnit = true;
+        canSpawnRangedUnit = true;
+        canSpawnTankUnit = false;
+        canSpawnMountedUnit = false;
+        canSpawnSiegeUnit = false;
         if (spawnSide == SpawnSide.Left)
         {
             spawnLocation = leftSpawnPoint.transform.position;
@@ -35,41 +44,53 @@ public class UnitSpawner : MonoBehaviour
 
     public void SpawnClubman()
     {
-        SpawnEntity(clubmanPrefab);
+        if (resourceController.gold >= resourceController.clubmanCost && canSpawnMeleeUnit)
+        {
+            SpawnEntity(clubmanPrefab);
+            resourceController.DecreaseGold(resourceController.clubmanCost);
+        }
     }
 
     public void SpawnSlinger()
     {
-        SpawnEntity(slingerPrefab);
+        if (resourceController.gold >= resourceController.slingerCost && canSpawnRangedUnit)
+        {
+            SpawnEntity(slingerPrefab);
+            resourceController.DecreaseGold(resourceController.slingerCost);
+        }
     }
 
     public void SpawnStoneTank()
     {
-        SpawnEntity(stoneTankPrefab);
+        if (resourceController.gold >= resourceController.stoneTankCost && canSpawnTankUnit)
+        {
+            SpawnEntity(stoneTankPrefab);
+            resourceController.DecreaseGold(resourceController.stoneTankCost);
+        }
     }
 
     public void SpawnEntity(GameObject entityPrefab)
     {
         if (true)
         {
-            GameObject clubman = Instantiate(entityPrefab);
-            BoxCollider2D collider = clubman.AddComponent<BoxCollider2D>();
+            GameObject unitSpawned = Instantiate(entityPrefab);
+            BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
             collider.size = new Vector2(0.8f, 1.5f);
             collider.isTrigger = true;
 
-            Rigidbody2D rigidbody = clubman.AddComponent<Rigidbody2D>();
+            Rigidbody2D rigidbody = unitSpawned.AddComponent<Rigidbody2D>();
             rigidbody.bodyType = RigidbodyType2D.Kinematic;
-            clubman.transform.position = spawnLocation;
+            unitSpawned.transform.position = spawnLocation;
 
-            clubman.gameObject.tag = spawnSide.ToString();
+            unitSpawned.gameObject.tag = spawnSide.ToString();
             if (spawnSide == SpawnSide.Left)
             {
-                Flip(clubman);
-                clubman.GetComponent<UnitController>().isFacingRight = true;
+                Flip(unitSpawned);
+                unitSpawned.GetComponent<UnitController>().isFacingRight = true;
             }
             else
             {
-                clubman.GetComponent<UnitController>().isFacingRight = false;
+                unitSpawned.GetComponent<UnitController>().isFacingRight = false;
 
             }
         }

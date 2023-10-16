@@ -9,11 +9,19 @@ public class BuildingEditor : Editor
     SerializedProperty isStable;
     SerializedProperty isWorkshop;
 
+    //Farm
     SerializedProperty farmLevel;
     SerializedProperty goldIncrement;
     SerializedProperty goldIncrementCooldown;
+    SerializedProperty farmGoldMultiplier;
+
+    //Barrack
     SerializedProperty barrackLevel;
+
+    //Stable
     SerializedProperty stableLevel;
+
+    //Workshop
     SerializedProperty workshopLevel;
 
     void OnEnable()
@@ -31,6 +39,7 @@ public class BuildingEditor : Editor
         farmLevel = serializedObject.FindProperty("farmLevel");
         goldIncrement = serializedObject.FindProperty("goldIncrement");
         goldIncrementCooldown = serializedObject.FindProperty("goldIncrementCooldown");
+        farmGoldMultiplier = serializedObject.FindProperty("farmGoldMultiplier");
     }
 
     public override void OnInspectorGUI()
@@ -47,6 +56,7 @@ public class BuildingEditor : Editor
             EditorGUILayout.PropertyField(farmLevel);
             EditorGUILayout.PropertyField(goldIncrement);
             EditorGUILayout.PropertyField(goldIncrementCooldown);
+            EditorGUILayout.PropertyField(farmGoldMultiplier);
         }
         else if (isBarrack.boolValue)
         {

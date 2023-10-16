@@ -146,14 +146,11 @@ public class UnitController : MonoBehaviour
     {
         if (currentHealth <= 0 && this.gameObject.activeInHierarchy) // Check if the unit is still active
         {
+            currentHealth = 0;
             Death();
         }
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth);
-        if (currentHealth <= 0 && this.gameObject.activeInHierarchy) // Check if the unit is still active
-        {
-            Death();
-        }
     }
 
 

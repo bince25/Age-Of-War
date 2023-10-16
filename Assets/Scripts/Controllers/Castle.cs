@@ -17,6 +17,10 @@ public class Castle : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+        }
         healthBar.SetHealth(currentHealth);
     }
 }
