@@ -202,12 +202,4 @@ public class Building : MonoBehaviour
             }
         }
     }
-
-    public enum BuildingType
-    {
-        Farm,
-        Barrack,
-        Stable,
-        Workshop
-    }
 }
