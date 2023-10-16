@@ -142,7 +142,7 @@ public class UnitController : MonoBehaviour
         }
     }
 
-    void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         if (currentHealth <= 0 && this.gameObject.activeInHierarchy) // Check if the unit is still active
         {

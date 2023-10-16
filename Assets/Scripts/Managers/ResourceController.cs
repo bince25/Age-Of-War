@@ -15,6 +15,7 @@ public class ResourceController : MonoBehaviour
     public int clubmanCost;
     public int slingerCost;
     public int stoneTankCost;
+    public int turretCost;
 
     UnitSpawner unitSpawner;
 
