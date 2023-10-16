@@ -11,6 +11,10 @@ TagManager:
   - Right
   - LeftCastle
   - RightCastle
+  - LeftBarrack
+  - LeftWorkshop
+  - LeftStable
+  - LeftFarm
   layers:
   - Default
   - TransparentFX
