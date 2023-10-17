@@ -9,7 +9,8 @@ public class ResourceController : MonoBehaviour
 {
 
     [SerializeField]
-    public TextMeshProUGUI goldText, ageText, ageProgressionText, ageGoalText, happinessText;
+    public TextMeshProUGUI goldText, ageText, ageProgressionText, ageGoalText, foodText, happinessText;
+    public Image happinessIcon;
 
     [Header("Unit Costs")]
     public int clubmanCost;
@@ -19,10 +20,14 @@ public class ResourceController : MonoBehaviour
 
     UnitSpawner unitSpawner;
 
+    [SerializeField]
+
+    private Sprite[] resourceSprites;
+
     [Space(15)]
     public SpawnSide playerSide;
     int multiplier = 1;
-    public int gold, ageProgression, happiness;
+    public int gold, ageProgression, happiness, food;
     private bool readyForIronAge, readyForMedievalAge, readyForRenaissanceAge, readyForModernAge, readyForFutureAge;
     void Start()
     {
@@ -33,12 +38,7 @@ public class ResourceController : MonoBehaviour
         ageGoalText.text = Constants.TO_IRON_AGE.ToString();
         goldText.text = gold.ToString();
         happinessText.text = happiness.ToString();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        foodText.text = food.ToString();
     }
 
     public void UnitDied(string unitSide, string unitType)
@@ -84,6 +84,36 @@ public class ResourceController : MonoBehaviour
 
     }
 
+    void UpdateTextColor(TextMeshProUGUI text, int amount)
+    {
+        if (amount < 0)
+        {
+            text.color = Color.red;
+        }
+        else if (amount > 0)
+        {
+            text.color = Color.green;
+        }
+        else
+        {
+            text.color = Color.white;
+        }
+    }
+    public void IncreaseFood(int amount)
+    {
+        food += amount;
+        foodText.text = food.ToString();
+        UpdateTextColor(foodText, food);
+    }
+
+    public void DecreaseFood(int amount)
+    {
+        food -= amount;
+        foodText.text = food.ToString();
+        UpdateTextColor(foodText, food);
+    }
+
+
     public void IncreaseGold(int amount)
     {
         gold += amount;
@@ -128,5 +158,25 @@ public class ResourceController : MonoBehaviour
     {
         happiness += amount;
         happinessText.text = happiness.ToString();
+        UpdateTextColor(happinessText, happiness);
+        UpdateHappinessIcon();
+    }
+    public void DecreaseHappiness(int amount)
+    {
+        happiness -= amount;
+        happinessText.text = happiness.ToString();
+        UpdateTextColor(happinessText, happiness);
+        UpdateHappinessIcon();
+    }
+    void UpdateHappinessIcon()
+    {
+        if (happiness < 0)
+        {
+            happinessIcon.sprite = resourceSprites[1];
+        }
+        else
+        {
+            happinessIcon.sprite = resourceSprites[0];
+        }
     }
 }

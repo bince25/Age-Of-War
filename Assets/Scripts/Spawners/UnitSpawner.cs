@@ -1,4 +1,8 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
 
 public class UnitSpawner : MonoBehaviour
 {
@@ -14,6 +18,13 @@ public class UnitSpawner : MonoBehaviour
 
     [Space(10)]
 
+    [Header("Spawn Times")]
+    public int clubmanSpawnTime;
+    public int slingerSpawnTime;
+    public int stoneTankSpawnTime;
+
+    [Space(10)]
+
     [SerializeField]
     private GameObject leftSpawnPoint;
     [SerializeField]
@@ -21,6 +32,22 @@ public class UnitSpawner : MonoBehaviour
 
     private Vector3 spawnLocation;
     private Vector3 spawnCheckLocation;
+
+    public Slider progressBarSlider;
+    public TextMeshProUGUI progressBarText;
+
+    //--------------------------------Queue & Unit Spawn------------------------------------------
+    private bool isSpawning = false;
+    private Queue<UnitSpawnData> unitQueue = new Queue<UnitSpawnData>();
+
+    private int queueLimit = 5;
+
+    public Image[] queueImages;
+
+    public Sprite[] unitSpritesForQueue;
+
+
+    //------------------------------------------------------------------------------------------
 
     void Start()
     {
@@ -30,6 +57,8 @@ public class UnitSpawner : MonoBehaviour
         canSpawnTankUnit = false;
         canSpawnMountedUnit = false;
         canSpawnSiegeUnit = false;
+        progressBarSlider.interactable = false;
+
         if (spawnSide == SpawnSide.Left)
         {
             spawnLocation = leftSpawnPoint.transform.position;
@@ -42,11 +71,73 @@ public class UnitSpawner : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (unitQueue.Count > 0)
+        {
+            if (!isSpawning)
+            {
+                SpawnNextUnitInQueue();
+                isSpawning = true;
+            }
+        }
+    }
+
+    private class UnitSpawnData
+    {
+        public GameObject prefab;
+        public float spawnTime;
+
+        public UnitSpawnData(GameObject prefab, float spawnTime)
+        {
+            this.prefab = prefab;
+            this.spawnTime = spawnTime;
+        }
+    }
+
+    public void QueueUnitSpawn(GameObject unitPrefab, float spawnTime)
+    {
+        if (unitQueue.Count < queueLimit)
+        {
+            unitQueue.Enqueue(new UnitSpawnData(unitPrefab, spawnTime));
+            UpdateQueueUI();
+        }
+    }
+
+    private void UpdateQueueUI()
+    {
+        // Clear the current queue display.
+        for (int i = 0; i < queueImages.Length; i++)
+        {
+            if (i < unitQueue.Count)
+            {
+                // Customize the queue image or sprite with the unit's appearance.
+                // For example: queueImages[i].sprite = unitQueue.ElementAt(i).prefab.GetComponent<SpriteRenderer>().sprite;
+                queueImages[i].gameObject.SetActive(true); // Show the image.
+                queueImages[i].sprite = unitSpritesForQueue[i];
+            }
+            else
+            {
+                queueImages[i].gameObject.SetActive(false); // Hide unused slots.
+            }
+        }
+    }
+
+    public void SpawnNextUnitInQueue()
+    {
+        if (unitQueue.Count > 0)
+        {
+            UnitSpawnData nextUnitData = unitQueue.Dequeue();
+            UpdateQueueUI();
+            StartCoroutine(SpawnEntity(nextUnitData.prefab, nextUnitData.spawnTime));
+        }
+    }
+
     public void SpawnClubman()
     {
         if (resourceController.gold >= resourceController.clubmanCost && canSpawnMeleeUnit)
         {
-            SpawnEntity(clubmanPrefab);
+            QueueUnitSpawn(clubmanPrefab, clubmanSpawnTime);
             resourceController.DecreaseGold(resourceController.clubmanCost);
         }
     }
@@ -55,7 +146,7 @@ public class UnitSpawner : MonoBehaviour
     {
         if (resourceController.gold >= resourceController.slingerCost && canSpawnRangedUnit)
         {
-            SpawnEntity(slingerPrefab);
+            QueueUnitSpawn(slingerPrefab, slingerSpawnTime);
             resourceController.DecreaseGold(resourceController.slingerCost);
         }
     }
@@ -64,36 +155,59 @@ public class UnitSpawner : MonoBehaviour
     {
         if (resourceController.gold >= resourceController.stoneTankCost && canSpawnTankUnit)
         {
-            SpawnEntity(stoneTankPrefab);
+            QueueUnitSpawn(stoneTankPrefab, stoneTankSpawnTime);
             resourceController.DecreaseGold(resourceController.stoneTankCost);
         }
     }
 
-    public void SpawnEntity(GameObject entityPrefab)
+    public IEnumerator SpawnEntity(GameObject entityPrefab, float spawnTime)
     {
-        if (true)
+        yield return StartCoroutine(SpawnProgress(spawnTime));
+
+        GameObject unitSpawned = Instantiate(entityPrefab);
+        progressBarSlider.value = 0f;
+        progressBarText.text = "0%";
+        BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
+        collider.size = new Vector2(0.8f, 1.5f);
+        collider.isTrigger = true;
+
+        Rigidbody2D rigidbody = unitSpawned.AddComponent<Rigidbody2D>();
+        rigidbody.bodyType = RigidbodyType2D.Kinematic;
+        unitSpawned.transform.position = spawnLocation;
+
+        unitSpawned.gameObject.tag = spawnSide.ToString();
+        if (spawnSide == SpawnSide.Left)
         {
-            GameObject unitSpawned = Instantiate(entityPrefab);
-            BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
-            collider.size = new Vector2(0.8f, 1.5f);
-            collider.isTrigger = true;
-
-            Rigidbody2D rigidbody = unitSpawned.AddComponent<Rigidbody2D>();
-            rigidbody.bodyType = RigidbodyType2D.Kinematic;
-            unitSpawned.transform.position = spawnLocation;
-
-            unitSpawned.gameObject.tag = spawnSide.ToString();
-            if (spawnSide == SpawnSide.Left)
-            {
-                Flip(unitSpawned);
-                unitSpawned.GetComponent<UnitController>().isFacingRight = true;
-            }
-            else
-            {
-                unitSpawned.GetComponent<UnitController>().isFacingRight = false;
-
-            }
+            Flip(unitSpawned);
+            unitSpawned.GetComponent<UnitController>().isFacingRight = true;
         }
+        else
+        {
+            unitSpawned.GetComponent<UnitController>().isFacingRight = false;
+        }
+    }
+
+    public IEnumerator SpawnProgress(float spawnTime)
+    {
+
+        float timer = 0f;
+        while (timer < spawnTime)
+        {
+            float progress = timer / spawnTime;
+
+            if (progressBarSlider != null)
+            {
+                progressBarSlider.value = progress;
+                progressBarText.text = Mathf.RoundToInt(progress * 100) + "%";
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Set the progress bar to its final value (1) after the loop ends.
+        progressBarSlider.value = 1f;
+        isSpawning = false;
     }
     public bool CheckSpawnPoint()
     {
