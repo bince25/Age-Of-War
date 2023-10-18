@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Castle : MonoBehaviour
 {
+    public string id;
     public int maxHealth = 100;
     public int currentHealth;
     public HealthBar healthBar;

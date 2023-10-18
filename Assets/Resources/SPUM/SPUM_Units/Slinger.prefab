@@ -5939,7 +5939,7 @@ GameObject:
   - component: {fileID: 12476420510310565}
   - component: {fileID: -2692532258143980275}
   m_Layer: 5
-  m_Name: Unit005
+  m_Name: Slinger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1322,7 +1322,7 @@ GameObject:
   - component: {fileID: 5154216487305073868}
   - component: {fileID: -2723130461528784653}
   m_Layer: 5
-  m_Name: Unit003 1
+  m_Name: StoneTank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

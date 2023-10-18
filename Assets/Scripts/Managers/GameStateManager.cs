@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class GameStateManager : MonoBehaviour
 {
@@ -19,6 +17,11 @@ public class GameStateManager : MonoBehaviour
 
     void Start()
     {
+        AuthManager.Instance.DefaultLogin(() =>
+        {
+            WebSocketClient.Instance.ConnectToWebSocket();
+        });
+
         leftCastle = GameObject.FindGameObjectWithTag("LeftCastle");
         rightCastle = GameObject.FindGameObjectWithTag("RightCastle");
     }
@@ -42,10 +45,39 @@ public class GameStateManager : MonoBehaviour
         {
             RestartGame();
         }
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            GameMessage message = new GameMessage
+            {
+                action = "startGame",
+                data = new GameData
+                {
+                    attackerId = this.gameObject.name, // or some unique ID for the unit
+                },
+                token = PlayerPrefs.GetString("accessToken")
+            };
+
+            string jsonMessage = JsonUtility.ToJson(message);
+            WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+        }
     }
 
     void RestartGame()
     {
-        Application.LoadLevel(Application.loadedLevel);
+        SceneManager.LoadScene(Application.loadedLevel);
     }
+}
+
+[System.Serializable]
+public class GameMessage
+{
+    public string action;
+    public GameData data;
+    public string token;
+}
+
+[System.Serializable]
+public class GameData
+{
+    public string attackerId;
 }

@@ -153,6 +153,18 @@ public class UnitController : MonoBehaviour
         healthBar.SetHealth(currentHealth);
     }
 
+    public void AttackUnitByID(string targetID, int damageAmount)
+    {
+        if (GameManager.Instance.unitsDictionary.ContainsKey(targetID))
+        {
+            GameManager.Instance.unitsDictionary[targetID].TakeDamage(damageAmount);
+        }
+        else
+        {
+            Debug.LogWarning("No unit found with ID: " + targetID);
+        }
+    }
+
 
     void Attack(GameObject target)
     {
@@ -162,11 +174,43 @@ public class UnitController : MonoBehaviour
         Castle castle = target.GetComponent<Castle>();
         if (targetController != null)
         {
-            targetController.TakeDamage(attackDamage);
+            AttackMessage message = new AttackMessage
+            {
+                action = "unitAttack",
+                data = new UnitAttackData
+                {
+                    attackerId = this.gameObject.name, // or some unique ID for the unit
+                    targetId = target.gameObject.name, // or some unique ID for the target
+                    damage = attackDamage,
+                    gameId = PlayerPrefs.GetString("gameId")
+                },
+                token = PlayerPrefs.GetString("accessToken"),
+            };
+
+            string jsonMessage = JsonUtility.ToJson(message);
+            WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+
+            // targetController.TakeDamage(attackDamage);
         }
         else if (castle != null)
         {
-            castle.TakeDamage(attackDamage);
+            CastleAttackMessage message = new CastleAttackMessage
+            {
+                action = "attackCastle",
+                data = new CastleAttackData
+                {
+                    attackerId = this.gameObject.name, // or some unique ID for the unit
+                    targetSide = this.isFacingRight ? SpawnSide.RightCastle.ToString() : SpawnSide.LeftCastle.ToString(), // or some unique ID for the target
+                    damage = attackDamage,
+                    gameId = PlayerPrefs.GetString("gameId")
+                },
+                token = PlayerPrefs.GetString("accessToken"),
+            };
+
+            string jsonMessage = JsonUtility.ToJson(message);
+            WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+
+            // castle.TakeDamage(attackDamage);
         }
     }
 
@@ -365,4 +409,37 @@ public class UnitController : MonoBehaviour
         return 0f; // Return 0 if no animation with that name is found.
     }
 
+}
+[System.Serializable]
+public class AttackMessage
+{
+    public string action;
+    public UnitAttackData data;
+    public string token;
+}
+
+[System.Serializable]
+public class UnitAttackData
+{
+    public string attackerId;
+    public string targetId;
+    public int damage;
+
+    public string gameId;
+}
+
+[System.Serializable]
+public class CastleAttackMessage
+{
+    public string action;
+    public CastleAttackData data;
+    public string token;
+}
+[System.Serializable]
+public class CastleAttackData
+{
+    public string gameId;
+    public string attackerId;
+    public string targetSide;
+    public int damage;
 }
