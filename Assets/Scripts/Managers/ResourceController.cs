@@ -12,11 +12,21 @@ public class ResourceController : MonoBehaviour
     public TextMeshProUGUI goldText, ageText, ageProgressionText, ageGoalText, foodText, happinessText;
     public Image happinessIcon;
 
+
+
     [Header("Unit Costs")]
     public int clubmanCost;
     public int slingerCost;
     public int stoneTankCost;
     public int turretCost;
+
+    [Header("Unit Rewards")]
+
+    public int clubmanReward;
+    public int slingerReward;
+    public int stoneTankReward;
+
+
 
     UnitSpawner unitSpawner;
 
@@ -41,7 +51,7 @@ public class ResourceController : MonoBehaviour
         foodText.text = food.ToString();
     }
 
-    public void UnitDied(string unitSide, string unitType)
+    public void UnitDied(string unitSide, UnitType unitType)
     {
         if (unitSide == playerSide.ToString())
         {
@@ -49,10 +59,29 @@ public class ResourceController : MonoBehaviour
         }
         else
         {
+            switch (unitType)
+            {
+                case UnitType.Clubman:
+                    IncreaseGold(clubmanReward);
+                    IncreaseAgeProgression(clubmanReward / 2);
+                    IncreaseHappiness(clubmanReward / 10);
+                    break;
+                case UnitType.Slinger:
+                    IncreaseGold(slingerReward);
+                    IncreaseAgeProgression(slingerReward / 2);
+                    IncreaseHappiness(slingerReward / 10);
+                    break;
+                case UnitType.StoneTank:
+                    IncreaseGold(stoneTankReward);
+                    IncreaseAgeProgression(stoneTankReward / 2);
+                    IncreaseHappiness(stoneTankReward / 10);
+                    break;
+                default:
+                    break;
+            }
+
             Debug.Log("Enemy died");
-            IncreaseGold(100);
-            IncreaseAgeProgression(10);
-            IncreaseHappiness(10);
+
         }
     }
 

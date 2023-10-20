@@ -1411,10 +1411,11 @@ MonoBehaviour:
   defaultLayer:
     serializedVersion: 2
     m_Bits: 0
-  maxHealth: 250
-  attackDamage: 14
+  maxHealth: 332
+  attackDamage: 27
   currentHealth: 0
   healthBar: {fileID: 3207974176976953999}
+  unitType: 11
   unitObject: {fileID: 2502067789977647696, guid: d2bc51510b09599449df9ff0fecbc934, type: 3}
   defaultAttackType: 0
   oppositeTag: RightSide

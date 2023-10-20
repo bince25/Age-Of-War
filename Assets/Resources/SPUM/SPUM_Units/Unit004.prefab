@@ -5444,11 +5444,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   maxHealth: 100
+  attackDamage: 10
   currentHealth: 0
   healthBar: {fileID: 3953936336745775053}
+  unitType: 6
   unitObject: {fileID: 8607689864826534917}
   defaultAttackType: 0
   oppositeTag: RightSide
+  oppositeCastleTag: RightCastle
   detectionRange: 2
   attackCooldown: 1
   speed: 4

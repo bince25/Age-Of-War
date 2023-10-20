@@ -2930,10 +2930,11 @@ MonoBehaviour:
   defaultLayer:
     serializedVersion: 2
     m_Bits: 0
-  maxHealth: 250
-  attackDamage: 14
+  maxHealth: 275
+  attackDamage: 41
   currentHealth: 0
   healthBar: {fileID: 561170302841816810}
+  unitType: 0
   unitObject: {fileID: 2502067789977647696, guid: d2bc51510b09599449df9ff0fecbc934, type: 3}
   defaultAttackType: 0
   oppositeTag: RightSide

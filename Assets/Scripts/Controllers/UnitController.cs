@@ -12,6 +12,8 @@ public class UnitController : MonoBehaviour
     public int currentHealth;
     public HealthBar healthBar;
 
+    [SerializeField]
+    private UnitType unitType;
 
     [SerializeField]
     private GameObject unitObject;
@@ -349,7 +351,7 @@ public class UnitController : MonoBehaviour
     {
         unitSpumController.PlayAnimation("death");
         ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
-        resourceController.UnitDied(gameObject.tag, gameObject.name);
+        resourceController.UnitDied(gameObject.tag, unitType);
         Destroy(this.gameObject, 0.5f); // Destroy the unit after 1 second
     }
 
