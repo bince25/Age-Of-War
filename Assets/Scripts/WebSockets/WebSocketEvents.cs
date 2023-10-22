@@ -36,8 +36,6 @@ public class WebSocketEvents : MonoBehaviour
 
     public void HandleMessage(string message)
     {
-        Debug.Log($"Received message: {message}");
-
         WSMessage wsMessage = JsonConvert.DeserializeObject<WSMessage>(message);
 
         switch (wsMessage.action)
@@ -51,6 +49,8 @@ public class WebSocketEvents : MonoBehaviour
                 // Accessing the castles data
                 CastleData leftCastle = gameStartedMessage.castles["LeftCastle"];
                 CastleData rightCastle = gameStartedMessage.castles["RightCastle"];
+
+                Debug.Log(leftCastle);
 
                 GameManager.Instance.castlesDictionary[SpawnSide.LeftCastle.ToString()].id = leftCastle.id;
                 GameManager.Instance.castlesDictionary[SpawnSide.LeftCastle.ToString()].currentHealth = leftCastle.health;
@@ -75,6 +75,10 @@ public class WebSocketEvents : MonoBehaviour
             case "castleAttacked":
                 Debug.Log("Castle attacked");
                 GameManager.Instance.castlesDictionary[wsMessage.data["targetSide"].ToString()].TakeDamage((int)wsMessage.data["damage"]);
+                break;
+            case "unitDied":
+                Debug.Log("Unit died");
+                GameManager.Instance.unitsDictionary[wsMessage.data["unitId"].ToString()].Death();
                 break;
         }
 

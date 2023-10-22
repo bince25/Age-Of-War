@@ -35,7 +35,7 @@ public class AuthManager : MonoBehaviour
                 {
                     // Assuming the token is in the JSON response
                     accessToken = PlayerPrefs.GetString("accessToken");
-                    Debug.Log("Logged in successfully! Token: ");
+                    Debug.Log("Logged in successfully!");
                     onSuccess.Invoke();
                 }
                 else

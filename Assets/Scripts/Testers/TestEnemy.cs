@@ -1,13 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TestEnemy : MonoBehaviour
 {
+    private bool startToSpawn;
+    private bool spawned = false;
     void Start()
     {
-        // Continuously spawn units every 5 seconds
-        StartCoroutine(Spawn());
     }
 
     IEnumerator Spawn()
@@ -22,7 +21,15 @@ public class TestEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (startToSpawn && !spawned)
+        {
+            spawned = true;
+            StartCoroutine(Spawn());
+        }
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            startToSpawn = true;
+        }
     }
 
 }

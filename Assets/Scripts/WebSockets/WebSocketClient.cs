@@ -66,13 +66,16 @@ public class WebSocketClient : MonoBehaviour
 
     private void Update()
     {
+        if (websocket != null)
+        {
 #if !UNITY_WEBGL || UNITY_EDITOR
-        websocket.DispatchMessageQueue();
+            websocket.DispatchMessageQueue();
 #endif
+        }
     }
 
     private async void OnApplicationQuit()
     {
-        await websocket.Close();
+        if (websocket != null) await websocket.Close();
     }
 }

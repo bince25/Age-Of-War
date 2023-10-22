@@ -17,11 +17,6 @@ public class GameStateManager : MonoBehaviour
 
     void Start()
     {
-        AuthManager.Instance.DefaultLogin(() =>
-        {
-            WebSocketClient.Instance.ConnectToWebSocket();
-        });
-
         leftCastle = GameObject.FindGameObjectWithTag("LeftCastle");
         rightCastle = GameObject.FindGameObjectWithTag("RightCastle");
     }

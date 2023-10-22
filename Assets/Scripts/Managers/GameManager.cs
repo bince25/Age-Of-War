@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public GameMode gameMode;
+    public IGameStrategy CurrentStrategy { get; private set; }
+
     [SerializeField]
     private GameObject leftCastle, rightCastle;
     public static GameManager Instance { get; private set; }
@@ -29,8 +32,28 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        SetGameStrategy(new LocalGameStrategy());
         castlesDictionary.Add(SpawnSide.LeftCastle.ToString(), leftCastle.GetComponent<Castle>());
         castlesDictionary.Add(SpawnSide.RightCastle.ToString(), rightCastle.GetComponent<Castle>());
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            // Switch to online strategy
+            SetGameStrategy(new OnlineGameStrategy());
+            AuthManager.Instance.DefaultLogin(() =>
+            {
+                WebSocketClient.Instance.ConnectToWebSocket();
+            });
+
+        }
+    }
+
+    public void SetGameStrategy(IGameStrategy strategy)
+    {
+        CurrentStrategy = strategy;
     }
 }
 

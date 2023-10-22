@@ -2234,6 +2234,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa4dc9eac4b0e434a811d8a458a607fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnSide: 1
+  isDead: 0
   defaultLayer:
     serializedVersion: 2
     m_Bits: 0

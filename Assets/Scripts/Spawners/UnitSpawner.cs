@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class UnitSpawner : MonoBehaviour
 {
     [SerializeField]
-    private SpawnSide spawnSide;
+    public SpawnSide spawnSide;
     private ResourceController resourceController;
 
     [Space(10)]
@@ -30,13 +30,12 @@ public class UnitSpawner : MonoBehaviour
     [SerializeField]
     private GameObject rightSpawnPoint;
 
-    private Vector3 spawnLocation;
+    public Vector3 spawnLocation;
     private Vector3 spawnCheckLocation;
 
     public Slider progressBarSlider;
     public TextMeshProUGUI progressBarText;
 
-    //--------------------------------Queue & Unit Spawn------------------------------------------
     private bool isSpawning = false;
     private Queue<UnitSpawnData> unitQueue = new Queue<UnitSpawnData>();
 
@@ -45,9 +44,6 @@ public class UnitSpawner : MonoBehaviour
     public Image[] queueImages;
 
     public Sprite[] unitSpritesForQueue;
-
-
-    //------------------------------------------------------------------------------------------
 
     void Start()
     {
@@ -73,13 +69,9 @@ public class UnitSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (unitQueue.Count > 0)
+        if (unitQueue.Count > 0 && !isSpawning)
         {
-            if (!isSpawning)
-            {
-                SpawnNextUnitInQueue();
-                isSpawning = true;
-            }
+            SpawnNextUnitInQueue();
         }
     }
 
@@ -106,19 +98,16 @@ public class UnitSpawner : MonoBehaviour
 
     private void UpdateQueueUI()
     {
-        // Clear the current queue display.
         for (int i = 0; i < queueImages.Length; i++)
         {
             if (i < unitQueue.Count)
             {
-                // Customize the queue image or sprite with the unit's appearance.
-                // For example: queueImages[i].sprite = unitQueue.ElementAt(i).prefab.GetComponent<SpriteRenderer>().sprite;
-                queueImages[i].gameObject.SetActive(true); // Show the image.
+                queueImages[i].gameObject.SetActive(true);
                 queueImages[i].sprite = unitSpritesForQueue[i];
             }
             else
             {
-                queueImages[i].gameObject.SetActive(false); // Hide unused slots.
+                queueImages[i].gameObject.SetActive(false);
             }
         }
     }
@@ -137,15 +126,18 @@ public class UnitSpawner : MonoBehaviour
     {
         if (resourceController.gold >= resourceController.clubmanCost && canSpawnMeleeUnit)
         {
+            clubmanPrefab.GetComponent<UnitController>().spawnSide = spawnSide;
             QueueUnitSpawn(clubmanPrefab, clubmanSpawnTime);
             resourceController.DecreaseGold(resourceController.clubmanCost);
         }
     }
 
+
     public void SpawnSlinger()
     {
         if (resourceController.gold >= resourceController.slingerCost && canSpawnRangedUnit)
         {
+            slingerPrefab.GetComponent<UnitController>().spawnSide = spawnSide;
             QueueUnitSpawn(slingerPrefab, slingerSpawnTime);
             resourceController.DecreaseGold(resourceController.slingerCost);
         }
@@ -155,241 +147,142 @@ public class UnitSpawner : MonoBehaviour
     {
         if (resourceController.gold >= resourceController.stoneTankCost && canSpawnTankUnit)
         {
+            clubmanPrefab.GetComponent<UnitController>().spawnSide = spawnSide;
             QueueUnitSpawn(stoneTankPrefab, stoneTankSpawnTime);
             resourceController.DecreaseGold(resourceController.stoneTankCost);
         }
     }
 
-    // To send a spawn unit message to the server, use this method:
-    public void SendSpawnEntity(GameObject entityPrefab)
-    {
-        string id = System.Guid.NewGuid().ToString();
-        SpawnMessage message = new SpawnMessage
-        {
-            action = "spawnUnit",
-            data = new SpawnData
-            {
-                id = id,
-                type = entityPrefab.name,
-                side = spawnSide.ToString(),
-                health = entityPrefab.GetComponent<UnitController>().maxHealth,
-                gameId = PlayerPrefs.GetString("gameId")
-            },
-            token = PlayerPrefs.GetString("accessToken"),
-        };
-
-        string jsonMessage = JsonUtility.ToJson(message);
-        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
-    }
-
-    // Handle the server's spawn unit message using this method:
     public void HandleServerSpawnEntity(string unitType, string id, string unitSpawnSide)
     {
-        Debug.Log("Unit type: " + unitType);
+        GameObject prefabToSpawn = null;
+
         switch (unitType)
         {
             case "Clubman":
-                SpawnEntity(clubmanPrefab, id, unitSpawnSide);
+                prefabToSpawn = clubmanPrefab;
                 break;
             case "Slinger":
-                SpawnEntity(slingerPrefab, id, unitSpawnSide);
+                prefabToSpawn = slingerPrefab;
                 break;
             case "StoneTank":
-                SpawnEntity(stoneTankPrefab, id, unitSpawnSide);
+                prefabToSpawn = stoneTankPrefab;
                 break;
+            default:
+                Debug.LogError($"Unknown unit type: {unitType}");
+                return;
         }
-    }
 
-    // To send a spawn unit message to the server, use this method:
-    public void SendSpawnEntity(GameObject entityPrefab)
-    {
-        string id = System.Guid.NewGuid().ToString();
-        SpawnMessage message = new SpawnMessage
+        Vector3 unitSpawnLocation = unitSpawnSide == SpawnSide.Left.ToString() ? leftSpawnPoint.transform.position : rightSpawnPoint.transform.position;
+
+        GameObject unitSpawned = Instantiate(prefabToSpawn, unitSpawnLocation, Quaternion.identity);
+        unitSpawned.gameObject.name = id;
+        GameManager.Instance.unitsDictionary.Add(id, unitSpawned.GetComponent<UnitController>());
+
+        BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
+        collider.size = new Vector2(0.8f, 1.5f);
+        collider.isTrigger = true;
+
+        Rigidbody2D rigidbody = unitSpawned.AddComponent<Rigidbody2D>();
+        rigidbody.bodyType = RigidbodyType2D.Kinematic;
+
+        unitSpawned.gameObject.tag = unitSpawnSide;
+        if (unitSpawnSide == SpawnSide.Left.ToString())
         {
-            action = "spawnUnit",
-            data = new SpawnData
-            {
-                id = id,
-                type = entityPrefab.name,
-                side = spawnSide.ToString(),
-                health = entityPrefab.GetComponent<UnitController>().maxHealth,
-                gameId = PlayerPrefs.GetString("gameId")
-            },
-            token = PlayerPrefs.GetString("accessToken"),
-        };
-
-        string jsonMessage = JsonUtility.ToJson(message);
-        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
-    }
-
-    // Handle the server's spawn unit message using this method:
-    public void HandleServerSpawnEntity(string unitType, string id, string unitSpawnSide)
-    {
-        Debug.Log("Unit type: " + unitType);
-        switch (unitType)
+            Flip(unitSpawned);
+            unitSpawned.GetComponent<UnitController>().isFacingRight = true;
+        }
+        else
         {
-            case "Clubman":
-                SpawnEntity(clubmanPrefab, id, unitSpawnSide);
-                break;
-            case "Slinger":
-                SpawnEntity(slingerPrefab, id, unitSpawnSide);
-                break;
-            case "StoneTank":
-                SpawnEntity(stoneTankPrefab, id, unitSpawnSide);
-                break;
+            unitSpawned.GetComponent<UnitController>().isFacingRight = false;
         }
     }
 
     public IEnumerator SpawnEntity(GameObject entityPrefab, float spawnTime)
     {
-        yield return StartCoroutine(SpawnProgress(spawnTime));
+        yield return StartCoroutine(SpawnProgress(spawnTime, entityPrefab));
+    }
 
-        GameObject unitSpawned = Instantiate(entityPrefab);
-        progressBarSlider.value = 0f;
-        progressBarText.text = "0%";
-        BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
-        collider.size = new Vector2(0.8f, 1.5f);
-        collider.isTrigger = true;
-        if (true)
+    public IEnumerator SpawnProgress(float spawnTime, GameObject entityPrefab)
+    {
+        float timer = 0f;
+
+        bool spawned = false;
+
+        while (timer < spawnTime)
         {
-            GameObject unitSpawned = Instantiate(entityPrefab);
+            float progress = timer / spawnTime;
+            progressBarSlider.value = progress;
+            progressBarText.text = Mathf.RoundToInt(progress * 100) + "%";
+            timer += Time.deltaTime;
 
-            string unitID = System.Guid.NewGuid().ToString();
-            unitSpawned.gameObject.name = unitID;
-            GameManager.Instance.unitsDictionary.Add(unitID, unitSpawned.GetComponent<UnitController>());
-
-            BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
-            collider.size = new Vector2(0.8f, 1.5f);
-            collider.isTrigger = true;
-
-            Rigidbody2D rigidbody = unitSpawned.AddComponent<Rigidbody2D>();
-            rigidbody.bodyType = RigidbodyType2D.Kinematic;
-            Vector3 unitSpawnLocation =
-            unitSpawned.transform.position = spawnLocation;
-
-            unitSpawned.gameObject.tag = spawnSide.ToString();
-            if (spawnSide == SpawnSide.Left)
+            if (spawnTime - timer < 0.1f && !spawned)
             {
-                Flip(unitSpawned);
-                unitSpawned.GetComponent<UnitController>().isFacingRight = true;
+                GameManager.Instance.CurrentStrategy.HandleUnitSpawn(this, entityPrefab);
+                spawned = true;
             }
-            else
-            {
-                unitSpawned.GetComponent<UnitController>().isFacingRight = false;
-            }
+
+            yield return null;
         }
 
-        public IEnumerator SpawnProgress(float spawnTime)
+        progressBarSlider.value = 1f;
+
+        isSpawning = false;
+    }
+
+    public GameObject InstantiateUnit(GameObject gameObject, Vector3 position, Quaternion rotation)
+    {
+        return Instantiate(gameObject, position, rotation);
+    }
+
+    public bool CheckSpawnPoint(SpawnSide spawnSide)
+    {
+        Vector3 spawnCheckLocation = spawnSide == SpawnSide.Left ? spawnLocation + Vector3.right : spawnLocation + Vector3.left;
+
+        Collider2D collider1 = Physics2D.OverlapCircle(spawnCheckLocation, 1f);
+        Collider2D collider2 = Physics2D.OverlapCircle(spawnLocation, 1f);
+        if (collider1 && collider2)
         {
-
-            float timer = 0f;
-            while (timer < spawnTime)
-            {
-                float progress = timer / spawnTime;
-
-                if (progressBarSlider != null)
-                {
-                    progressBarSlider.value = progress;
-                    progressBarText.text = Mathf.RoundToInt(progress * 100) + "%";
-                }
-
-                timer += Time.deltaTime;
-                yield return null;
-            }
-
-            // Set the progress bar to its final value (1) after the loop ends.
-            progressBarSlider.value = 1f;
-            isSpawning = false;
-        }
-
-        public void SpawnEntity(GameObject entityPrefab, string id, string unitSpawnSide)
-        {
-            if (true)
-            {
-                GameObject unitSpawned = Instantiate(entityPrefab);
-
-                unitSpawned.gameObject.name = id;
-
-                GameManager.Instance.unitsDictionary.Add(id, unitSpawned.GetComponent<UnitController>());
-
-                BoxCollider2D collider = unitSpawned.AddComponent<BoxCollider2D>();
-                collider.size = new Vector2(0.8f, 1.5f);
-                collider.isTrigger = true;
-
-                Rigidbody2D rigidbody = unitSpawned.AddComponent<Rigidbody2D>();
-                rigidbody.bodyType = RigidbodyType2D.Kinematic;
-                Vector3 unitSpawnLocation = unitSpawnSide == SpawnSide.Left.ToString() ? leftSpawnPoint.transform.position : rightSpawnPoint.transform.position;
-                unitSpawned.transform.position = unitSpawnLocation;
-
-                unitSpawned.gameObject.tag = unitSpawnSide;
-                if (unitSpawnSide == SpawnSide.Left.ToString())
-                {
-                    Flip(unitSpawned);
-                    unitSpawned.GetComponent<UnitController>().isFacingRight = true;
-                }
-                else
-                {
-                    unitSpawned.GetComponent<UnitController>().isFacingRight = false;
-
-                }
-            }
-        }
-
-        public bool CheckSpawnPoint()
-        {
-            Collider2D collider1 = Physics2D.OverlapCircle(spawnCheckLocation, 1f);
-            Collider2D collider2 = Physics2D.OverlapCircle(spawnLocation, 1f);
-            if (collider1 && collider2)
-            {
-                if (collider1.gameObject.tag != "LeftCastle" || collider2.gameObject.tag == "RightCastle")
-                {
-                    return true;
-                }
-                return false;
-            }
-            else
+            if (collider1.gameObject.tag != "LeftCastle" || collider2.gameObject.tag == "RightCastle")
             {
                 return true;
             }
+            return false;
         }
-
-        public void Flip(GameObject unit)
+        else
         {
-
-            // Get the local scale
-            Vector3 localScale = unit.transform.localScale;
-
-            Transform firstChild = unit.transform.GetChild(0).GetChild(0);
-            Vector3 firstChildLocalScale = firstChild.localScale;
-
-
-            // Flip the x-component (horizontal mirroring)
-            localScale.x *= -1;
-            firstChildLocalScale.x *= -1;
-            // Apply the adjusted local scale
-            unit.transform.localScale = localScale;
-            firstChild.localScale = firstChildLocalScale;
+            return true;
         }
-
     }
 
-
-    [System.Serializable]
-    public class SpawnMessage
+    public void Flip(GameObject unit)
     {
-        public string action;
-        public SpawnData data;
-        public string token;
+        Vector3 localScale = unit.transform.localScale;
+        Transform firstChild = unit.transform.GetChild(0).GetChild(0);
+        Vector3 firstChildLocalScale = firstChild.localScale;
+
+        localScale.x *= -1;
+        firstChildLocalScale.x *= -1;
+
+        unit.transform.localScale = localScale;
+        firstChild.localScale = firstChildLocalScale;
     }
+}
 
-    [System.Serializable]
-    public class SpawnData
-    {
-        public string id;
-        public string type;
-        public string side;
-        public int health;
+[System.Serializable]
+public class SpawnMessage
+{
+    public string action;
+    public SpawnData data;
+    public string token;
+}
 
-        public string gameId;
-    }
-
+[System.Serializable]
+public class SpawnData
+{
+    public string id;
+    public string type;
+    public string side;
+    public int health;
+    public string gameId;
+}

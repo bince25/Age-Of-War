@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class UnitController : MonoBehaviour
 {
+    public SpawnSide spawnSide;
+    public bool isDead = false;
     public LayerMask defaultLayer;
     public int maxHealth = 100;
 
@@ -42,6 +43,8 @@ public class UnitController : MonoBehaviour
     private bool isRunning = false;
     private Dictionary<AttackType, string> attackTypeToAnimationName;
 
+    private bool delayMovement = false;
+
     private string defaultAttackTypeAnimationName;
 
     private BoxCollider2D _collider;
@@ -52,6 +55,7 @@ public class UnitController : MonoBehaviour
 
     private void Start()
     {
+
         if (isFacingRight)
         {
             oppositeTag = SpawnSide.Right.ToString();
@@ -76,7 +80,7 @@ public class UnitController : MonoBehaviour
 
         defaultAttackTypeAnimationName = attackTypeToAnimationName[defaultAttackType];
 
-        _collider = GetComponent<BoxCollider2D>();
+        _collider = gameObject.GetComponent<BoxCollider2D>();
         if (!_collider.isTrigger)
         {
             _collider.isTrigger = true;
@@ -90,67 +94,100 @@ public class UnitController : MonoBehaviour
 
     private void Update()
     {
-        if (currentHealth < 0)
+        if (currentHealth <= 0 && !isDead)
         {
-            currentHealth = 0;
-            healthBar.SetHealth(currentHealth);
+            Death();
+            return; // Exit the Update method after calling Death
         }
-        switch (currentState)
+        if (!isDead)
         {
-            case UnitState.Walking:
-                if (!isRunning)
-                {
-                    Run();
-                }
-                Move();
-                break;
-            case UnitState.Attacking:
-                // Attacking logic is controlled by animation callbacks
-                isRunning = false;
-                if (currentTarget == null)
-                {
-                    currentState = UnitState.Walking;
-                    isStopped = false;
-                    isAnimating = false;
-                    Run();
-                    isRunning = false;
-                }
-                break;
-            case UnitState.Idle:
-                // check if there are any thing in front
-                // if not walk
-                // if yes, idle
-                Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 1.5f);
-                bool detected = false;
-                foreach (var hitCollider in hitColliders)
-                {
-                    if (hitCollider.gameObject.tag == oppositeTag || hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject)
+            switch (currentState)
+            {
+                case UnitState.Walking:
+                    if (!isRunning)
                     {
-                        detected = true;
-                        break;
+                        Run();
                     }
-                }
-                if (!detected)
-                {
-                    currentState = UnitState.Walking;
-                    isStopped = false;
-                    isAnimating = false;
-                    Run();
+                    if (delayMovement)
+                    {
+                        StartCoroutine(NormalizeSpeed(speed, 1f));
+                        speed = speed * .9f;
+                        delayMovement = false;
+                    }
+                    Move();
+                    break;
+                case UnitState.Attacking:
+                    // Attacking logic is controlled by animation callbacks
                     isRunning = false;
-                }
-                break;
+                    if (currentTarget == null) // Check if target is available and if the unit's health is above zero
+                    {
+                        currentState = UnitState.Walking;
+                        isStopped = false;
+                        isAnimating = false;
+
+                        if (CheckFront()) delayMovement = true;
+
+                        Run();
+                        isRunning = false;
+                    }
+                    break;
+                case UnitState.Idle:
+                    // check if there are any thing in front
+                    // if not walk
+                    // if yes, idle
+                    Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+                    bool detected = false;
+                    bool enemyDetected = false;
+                    foreach (var hitCollider in hitColliders)
+                    {
+                        if ((hitCollider.gameObject.tag == oppositeTag) || (hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject))
+                        {
+                            detected = true;
+
+                            if (hitCollider.gameObject.tag == oppositeTag)
+                            {
+                                enemyDetected = true;
+                                currentTarget = hitCollider.gameObject;
+                            }
+
+                            break;
+                        }
+                    }
+                    if (!detected)
+                    {
+                        currentState = UnitState.Walking;
+                        isStopped = false;
+                        isAnimating = false;
+                        Run();
+                        isRunning = false;
+                    }
+                    if (detected && enemyDetected)
+                    {
+                        currentState = UnitState.Attacking;
+                        isStopped = true;
+                        isAnimating = true;
+                        RunAnimation(defaultAttackTypeAnimationName);
+                    }
+                    if (isAnimating)
+                    {
+                        isAnimating = false;
+                    }
+                    break;
+            }
         }
     }
 
     public void TakeDamage(int damage)
     {
-        if (currentHealth <= 0 && this.gameObject.activeInHierarchy) // Check if the unit is still active
+        if (!isDead)
         {
-            currentHealth = 0;
-            Death();
+            if (currentHealth <= 0 && this.gameObject.activeInHierarchy) // Check if the unit is still active
+            {
+                currentHealth = 0;
+            }
+            currentHealth -= damage;
+            healthBar.SetHealth(currentHealth);
         }
-        currentHealth -= damage;
-        healthBar.SetHealth(currentHealth);
     }
 
     public void AttackUnitByID(string targetID, int damageAmount)
@@ -168,50 +205,7 @@ public class UnitController : MonoBehaviour
 
     void Attack(GameObject target)
     {
-        if (target == null || !target.activeInHierarchy || currentHealth <= 0) return; // Check if target is available and if the unit's health is above zero
-
-        UnitController targetController = target.GetComponent<UnitController>();
-        Castle castle = target.GetComponent<Castle>();
-        if (targetController != null)
-        {
-            AttackMessage message = new AttackMessage
-            {
-                action = "unitAttack",
-                data = new UnitAttackData
-                {
-                    attackerId = this.gameObject.name, // or some unique ID for the unit
-                    targetId = target.gameObject.name, // or some unique ID for the target
-                    damage = attackDamage,
-                    gameId = PlayerPrefs.GetString("gameId")
-                },
-                token = PlayerPrefs.GetString("accessToken"),
-            };
-
-            string jsonMessage = JsonUtility.ToJson(message);
-            WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
-
-            // targetController.TakeDamage(attackDamage);
-        }
-        else if (castle != null)
-        {
-            CastleAttackMessage message = new CastleAttackMessage
-            {
-                action = "attackCastle",
-                data = new CastleAttackData
-                {
-                    attackerId = this.gameObject.name, // or some unique ID for the unit
-                    targetSide = this.isFacingRight ? SpawnSide.RightCastle.ToString() : SpawnSide.LeftCastle.ToString(), // or some unique ID for the target
-                    damage = attackDamage,
-                    gameId = PlayerPrefs.GetString("gameId")
-                },
-                token = PlayerPrefs.GetString("accessToken"),
-            };
-
-            string jsonMessage = JsonUtility.ToJson(message);
-            WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
-
-            // castle.TakeDamage(attackDamage);
-        }
+        GameManager.Instance.CurrentStrategy.HandleUnitAttack(this, target);
     }
 
     void ApplyDamage()
@@ -234,8 +228,36 @@ public class UnitController : MonoBehaviour
         transform.position += new Vector3(moveDirection * speed, 0, 0) * Time.deltaTime;
     }
 
+    IEnumerator NormalizeSpeed(float initialSpeed, float time)
+    {
+        yield return new WaitForSeconds(time);
+        speed = initialSpeed;
+    }
+
+    bool CheckFront()
+    {
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+        bool detected = false;
+        foreach (var hitCollider in hitColliders)
+        {
+            if ((hitCollider.gameObject.tag == oppositeTag) || (hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject))
+            {
+                if (isFacingRight && hitCollider.gameObject.transform.position.x > transform.position.x ||
+                    !isFacingRight && hitCollider.gameObject.transform.position.x < transform.position.x)
+                {
+                    detected = true;
+                    break;
+                }
+            }
+        }
+
+        return detected;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (isDead) return;
+
         if (isFacingRight && collision.gameObject.transform.position.x < transform.position.x ||
             !isFacingRight && collision.gameObject.transform.position.x > transform.position.x)
         {
@@ -253,8 +275,35 @@ public class UnitController : MonoBehaviour
             currentState = UnitState.Idle;
             unitSpumController.PlayAnimation("idle");
 
-            //return;
+            Collider2D[] _hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange + 1.3f);
+            foreach (var hitCollider in _hitColliders)
+            {
+                if (hitCollider.gameObject.tag == oppositeTag || hitCollider.gameObject.tag == oppositeCastleTag)
+                {
+                    // Handle enemy behavior
+                    isAnimating = true;
+                    isStopped = true;  // Stop the unit when attacking
+                    currentState = UnitState.Attacking;
+                    currentTarget = hitCollider.gameObject;
+                    RunAnimation(defaultAttackTypeAnimationName);
+                    return; // Exit after handling the first enemy detected
+                }
+            }
+
+            return;
         }
+
+        // If the colliding object is an enemy
+        if (collision.gameObject.tag == oppositeTag)
+        {
+            isAnimating = true;
+            isStopped = true;  // Stop the unit when attacking
+            currentState = UnitState.Attacking;
+            currentTarget = collision.gameObject;
+            RunAnimation(defaultAttackTypeAnimationName);
+            return;
+        }
+
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange + 1.3f);
         foreach (var hitCollider in hitColliders)
         {
@@ -269,18 +318,6 @@ public class UnitController : MonoBehaviour
                 return; // Exit after handling the first enemy detected
             }
         }
-
-
-        // If the colliding object is an enemy
-        if (collision.gameObject.tag == oppositeTag)
-        {
-            isAnimating = true;
-            isStopped = true;  // Stop the unit when attacking
-            currentState = UnitState.Attacking;
-            currentTarget = collision.gameObject;
-            RunAnimation(defaultAttackTypeAnimationName);
-            return;
-        }
     }
 
     void OnDrawGizmosSelected()
@@ -288,36 +325,6 @@ public class UnitController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange + 1.3f);
     }
-
-    /*     void DetectAndAttackEnemy()
-        {
-            if (isAnimating || isAttackOnCooldown) return;
-
-            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange);
-            foreach (var hitCollider in hitColliders)
-            {
-                if (hitCollider.gameObject == this.gameObject) continue;
-
-                if (hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject)
-                {
-                    isAnimating = true;
-                    currentState = UnitState.Idle;
-                    RunAnimation("idle");
-                    return;
-                }
-
-                if (hitCollider.gameObject.tag == oppositeTag)
-                {
-                    isAnimating = true;
-                    isStopped = true;  // Stop the unit when attacking
-                    currentState = UnitState.Attacking;
-                    RunAnimation(defaultAttackTypeAnimationName);
-                    return;
-                }
-            }
-
-            currentState = UnitState.Walking;
-        } */
 
     void RunAnimation(string name)
     {
@@ -362,18 +369,6 @@ public class UnitController : MonoBehaviour
         }
     }
 
-
-
-
-    private IEnumerator Idle(float animationLength)
-    {
-        yield return new WaitForSeconds(animationLength + 0.001f);
-        unitSpumController.PlayAnimation("idle");
-        isAnimating = false;
-
-        // After the animation finishes, check if we should attack again
-    }
-
     private void Run()
     {
         if (!isRunning)
@@ -383,18 +378,27 @@ public class UnitController : MonoBehaviour
         }
     }
 
-
     private void Stun()
     {
         unitSpumController.PlayAnimation("debuff_stun");
     }
 
-    private void Death()
+    public void Death()
     {
+        Debug.Log("Unit " + gameObject.name + " died!");
+        if (isDead) return; // Ensure Death is only called once
+
+        isDead = true;
         unitSpumController.PlayAnimation("death");
+        // Disable the collider
+        if (_collider) _collider.enabled = false;
+
+        // Deactivate the game object immediately and then destroy it after the death animation
+        gameObject.SetActive(false);
+        Destroy(gameObject, 0.2f);// Destroy the unit after 1 second
+
         ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
         resourceController.UnitDied(gameObject.tag, gameObject.name);
-        Destroy(this.gameObject, 0.5f); // Destroy the unit after 1 second
     }
 
     public float GetAnimationLength(string name)
