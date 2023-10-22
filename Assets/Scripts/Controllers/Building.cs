@@ -17,8 +17,10 @@ public class Building : MonoBehaviour
     private Coroutine farmCoroutine;
     public int farmLevel;
     public int goldIncrement;
-    public float goldIncrementCooldown;
+    public float incrementCooldown;
     public float farmGoldMultiplier;
+    public float farmFoodMultiplier;
+    public int foodIncrement;
 
     [Header("Barrack")]
     public int barrackLevel;
@@ -78,12 +80,13 @@ public class Building : MonoBehaviour
     }
 
     //------------------------------------------FARM----------------------------------------------------------
-    IEnumerator FarmCoroutine(float multiplier = 1)
+    IEnumerator FarmCoroutine(float multiplier = 1, float foodMultiplier = 1)
     {
         while (true)
         {
-            yield return new WaitForSeconds(goldIncrementCooldown);
+            yield return new WaitForSeconds(incrementCooldown);
             resourceController.IncreaseGold((int)(goldIncrement * multiplier));
+            resourceController.IncreaseFood((int)(foodIncrement * foodMultiplier));
         }
     }
     public void ChangeFarmMultiplier(float newMultiplier)
@@ -100,7 +103,7 @@ public class Building : MonoBehaviour
         }
 
         // Start a new coroutine with the updated multiplier
-        farmCoroutine = StartCoroutine(FarmCoroutine(farmGoldMultiplier));
+        farmCoroutine = StartCoroutine(FarmCoroutine(farmGoldMultiplier, farmFoodMultiplier));
     }
 
     //--------------------------------------------------------------------------------------------------------
@@ -111,6 +114,7 @@ public class Building : MonoBehaviour
         {
             farmLevel++;
             farmGoldMultiplier *= 1.2f;
+            farmFoodMultiplier *= 1.4f;
             ChangeFarmMultiplier(farmGoldMultiplier);
         }
         else if (this.buildingType == BuildingType.Barrack)
