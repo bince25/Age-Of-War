@@ -2239,16 +2239,17 @@ MonoBehaviour:
   defaultLayer:
     serializedVersion: 2
     m_Bits: 0
-  maxHealth: 100
-  attackDamage: 10
+  maxHealth: 150
+  attackDamage: 24
   currentHealth: 0
   healthBar: {fileID: 3798507385957916012}
+  unitType: 4
   unitObject: {fileID: 5476588779887842500}
   defaultAttackType: 1
   oppositeTag: RightSide
   oppositeCastleTag: RightCastle
   detectionRange: 2
-  attackCooldown: 1
+  attackCooldown: 0.8
   speed: 4
   isFacingRight: 1
 --- !u!1 &5573605387930588343

@@ -13,6 +13,8 @@ public class UnitController : MonoBehaviour
     public int currentHealth;
     public HealthBar healthBar;
 
+    [SerializeField]
+    private UnitType unitType;
 
     [SerializeField]
     private GameObject unitObject;
