@@ -123,6 +123,7 @@ public class UnitController : MonoBehaviour
                     isRunning = false;
                     if (currentTarget == null) // Check if target is available and if the unit's health is above zero
                     {
+                        if (CheckInRange()) return;
                         currentState = UnitState.Walking;
                         isStopped = false;
                         isAnimating = false;
@@ -131,6 +132,19 @@ public class UnitController : MonoBehaviour
 
                         Run();
                         isRunning = false;
+                        break;
+                    }
+                    if (currentTarget.GetComponent<Castle>() != null)
+                    {
+                        if (!CheckFront())
+                        {
+                            currentState = UnitState.Walking;
+                            isStopped = false;
+                            isAnimating = false;
+                            Run();
+                            isRunning = false;
+                            break;
+                        }
                     }
                     break;
                 case UnitState.Idle:
@@ -178,6 +192,7 @@ public class UnitController : MonoBehaviour
             }
         }
     }
+
 
     public void TakeDamage(int damage)
     {
@@ -242,7 +257,7 @@ public class UnitController : MonoBehaviour
         bool detected = false;
         foreach (var hitCollider in hitColliders)
         {
-            if ((hitCollider.gameObject.tag == oppositeTag) || (hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject))
+            if ((hitCollider.gameObject.tag == oppositeTag || (hitCollider.gameObject.tag == oppositeCastleTag)) || (hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject))
             {
                 if (isFacingRight && hitCollider.gameObject.transform.position.x > transform.position.x ||
                     !isFacingRight && hitCollider.gameObject.transform.position.x < transform.position.x)
@@ -254,6 +269,48 @@ public class UnitController : MonoBehaviour
         }
 
         return detected;
+    }
+
+    bool CheckInRange()
+    {
+        Collider2D[] _hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange + 1.3f);
+        foreach (var hitCollider in _hitColliders)
+        {
+            if (hitCollider.gameObject.tag == oppositeTag || hitCollider.gameObject.tag == oppositeCastleTag)
+            {
+                // Handle enemy behavior
+                isAnimating = true;
+                isStopped = true;  // Stop the unit when attacking
+                currentState = UnitState.Attacking;
+                currentTarget = hitCollider.gameObject;
+                RunAnimation(defaultAttackTypeAnimationName);
+                return true; // Exit after handling the first enemy detected
+            }
+        }
+
+        return false;
+    }
+
+    bool CheckForEnemyUnit()
+    {
+        bool foundEnemyUnit = false; ;
+        Collider2D[] _hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange + 1.3f);
+        foreach (var hitCollider in _hitColliders)
+        {
+            if (hitCollider.gameObject.tag == oppositeTag)
+            {
+                foundEnemyUnit = true;
+                // Handle enemy behavior
+                isAnimating = true;
+                isStopped = true;  // Stop the unit when attacking
+                currentState = UnitState.Attacking;
+                currentTarget = hitCollider.gameObject;
+                RunAnimation(defaultAttackTypeAnimationName);
+                break; // Exit after handling the first enemy detected
+            }
+        }
+
+        return foundEnemyUnit;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
