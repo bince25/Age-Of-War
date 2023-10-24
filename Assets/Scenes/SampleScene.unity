@@ -2236,7 +2236,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -6694,7 +6694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnSide: 0
-  clubmanPrefab: {fileID: 8667632616415115290, guid: 1cd0faa9218ab4943a0e929e136ef87b, type: 3}
+  clubmanPrefab: {fileID: 5476588779887842500, guid: 5d5a01dc964ecb64db11d6826104601c, type: 3}
   slingerPrefab: {fileID: 9187753466255742611, guid: 3328f9ed514f7dd489bde6e9506be9d4, type: 3}
   stoneTankPrefab: {fileID: 2502067789977647696, guid: d2bc51510b09599449df9ff0fecbc934, type: 3}
   canSpawnMeleeUnit: 0
@@ -6707,6 +6707,7 @@ MonoBehaviour:
   stoneTankSpawnTime: 3
   leftSpawnPoint: {fileID: 1520876161}
   rightSpawnPoint: {fileID: 1723804754}
+  spawnLocation: {x: 0, y: 0, z: 0}
   progressBarSlider: {fileID: 1571574607}
   progressBarText: {fileID: 1382026304}
   queueImages: []
@@ -6805,6 +6806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ce4526a771184bc6b8e0073226de6e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameMode: 0
   leftCastle: {fileID: 141802615}
   rightCastle: {fileID: 394441645}
 --- !u!1 &824671788
@@ -7304,6 +7306,7 @@ MonoBehaviour:
   stoneTankSpawnTime: 8
   leftSpawnPoint: {fileID: 1520876161}
   rightSpawnPoint: {fileID: 1723804754}
+  spawnLocation: {x: 0, y: 0, z: 0}
   progressBarSlider: {fileID: 1571574607}
   progressBarText: {fileID: 1382026304}
   queueImages:
@@ -17740,6 +17743,7 @@ MonoBehaviour:
   stoneTankSpawnTime: 3
   leftSpawnPoint: {fileID: 1520876161}
   rightSpawnPoint: {fileID: 1723804754}
+  spawnLocation: {x: 0, y: 0, z: 0}
   progressBarSlider: {fileID: 1157130649}
   progressBarText: {fileID: 1367440413}
   queueImages: []

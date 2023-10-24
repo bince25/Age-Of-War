@@ -26,7 +26,7 @@ public class WebSocketClient : MonoBehaviour
 
     public async void ConnectToWebSocket()
     {
-        websocket = new WebSocket("ws://localhost:8080/game/ws");
+        websocket = new WebSocket("ws://167.172.105.111/game/ws");
 
         websocket.OnOpen += () =>
         {

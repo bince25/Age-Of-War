@@ -400,7 +400,7 @@ public class UnitController : MonoBehaviour
         Destroy(gameObject, 0.2f);// Destroy the unit after 1 second
 
         ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
-        resourceController.UnitDied(gameObject.tag, gameObject.name);
+        resourceController.UnitDied(gameObject.tag, this.unitType);
     }
 
     public float GetAnimationLength(string name)

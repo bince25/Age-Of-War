@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log(SpawnSide.LeftCastle.ToString());
         }
         else
         {

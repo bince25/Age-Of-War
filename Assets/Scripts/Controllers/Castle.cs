@@ -9,6 +9,7 @@ public class Castle : MonoBehaviour
     public int currentHealth;
     public HealthBar healthBar;
 
+    public SpawnSide spawnSide;
 
     void Start()
     {

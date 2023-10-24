@@ -5,7 +5,7 @@ public class AuthManager : MonoBehaviour
 {
     public static AuthManager Instance { get; private set; }
 
-    private string apiUrl = "http://localhost:8080/api/auth";
+    private string apiUrl = "http://167.172.105.111/api/auth";
     private string accessToken;
 
     private void Awake()
