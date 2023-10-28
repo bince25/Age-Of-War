@@ -105,6 +105,24 @@ public class OnlineGameStrategy : IGameStrategy
         return;
     }
 
+    public void HandleBuildingCreation(Building building)
+    {
+        BuildingCreationMessage message = new BuildingCreationMessage
+        {
+            action = "createBuilding",
+            data = new BuildingCreationData
+            {
+                gameId = PlayerPrefs.GetString("gameId"),
+                tag = building.gameObject.tag,
+            },
+            token = PlayerPrefs.GetString("accessToken"),
+        };
+
+        string jsonMessage = JsonUtility.ToJson(message);
+        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+        return;
+    }
+
     public void HandleAdvanceAge(SpawnSide side)
     {
         AdvanceAgeMessage message = new AdvanceAgeMessage
@@ -188,6 +206,21 @@ public class BuildingLevelUpData
 {
     public string gameId;
     public string tag;
+}
+
+[System.Serializable]
+public class BuildingCreationMessage
+{
+    public string action;
+    public BuildingCreationData data;
+    public string token;
+}
+
+[System.Serializable]
+public class BuildingCreationData
+{
+    public string tag;
+    public string gameId;
 }
 
 [System.Serializable]

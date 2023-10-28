@@ -103,6 +103,31 @@ public class WebSocketEvents : MonoBehaviour
                     GameStateManager.Instance.rightAge = (Ages)ageUpMessage.age;
                 }
                 break;
+            case "buildingUpgraded":
+                Debug.Log("Building upgraded");
+                BuildingMessage buildingMessage_ = wsMessage.data.ToObject<BuildingMessage>();
+                GameManager.Instance.buildingsDictionary[buildingMessage_.id].HandleLevelUp();
+                break;
+            case "buildingCreated":
+                Debug.Log("Building created");
+                BuildingMessage buildingMessage = wsMessage.data.ToObject<BuildingMessage>();
+                GameManager.Instance.buildingsDictionary[buildingMessage.id].HandleLevelUp();
+                break;
+            case "gameOver":
+                Debug.Log("Game over");
+                GameOverMessage gameOverMessage = wsMessage.data.ToObject<GameOverMessage>();
+
+                if (gameOverMessage.targetSide == SpawnSide.LeftCastle.ToString())
+                {
+                    GameManager.Instance.castlesDictionary[SpawnSide.LeftCastle.ToString()].GetComponent<Castle>().currentHealth = 0;
+                    GameManager.Instance.castlesDictionary[SpawnSide.Left.ToString()].GetComponent<Castle>().healthBar.SetHealth(0);
+                }
+                else
+                {
+                    GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].GetComponent<Castle>().currentHealth = 0;
+                    GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].GetComponent<Castle>().healthBar.SetHealth(0);
+                }
+                break;
         }
 
     }
@@ -173,4 +198,20 @@ public class AgeUpMessage
 {
     public string side;
     public int age;
+}
+
+[System.Serializable]
+public class BuildingMessage
+{
+    public string id;
+    public string type;
+    public int level;
+    public string side;
+}
+
+
+[System.Serializable]
+public class GameOverMessage
+{
+    public string targetSide;
 }

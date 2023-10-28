@@ -149,6 +149,11 @@ public class LocalGameStrategy : IGameStrategy
         }
     }
 
+    public void HandleBuildingCreation(Building building)
+    {
+        building.HandleLevelUp();
+    }
+
     public void HandleAdvanceAge(SpawnSide side)
     {
         ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();

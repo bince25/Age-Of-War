@@ -6,5 +6,6 @@ public interface IGameStrategy
     void HandleUnitAttack(UnitController attacker, GameObject target);
     void HandleProjectileSpawn(Turret turret, GameObject entityPrefab);
     void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, Building building);
+    void HandleBuildingCreation(Building building);
     void HandleAdvanceAge(SpawnSide side);
 }

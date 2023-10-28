@@ -69,8 +69,8 @@ public class WebSocketClient : MonoBehaviour
 
     public async void SendWebSocketMessage(string message, Action action = null)
     {
-        Debug.Log(websocket.State);
-        Debug.Log($"Sending message: {message}");
+        // Debug.Log(websocket.State);
+        // Debug.Log($"Sending message: {message}");
         await websocket.SendText(message);
 
         if (action != null)
