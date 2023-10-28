@@ -67,4 +67,139 @@ public class OnlineGameStrategy : IGameStrategy
             WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
         }
     }
+
+    public void HandleProjectileSpawn(Turret turret, GameObject entityPrefab)
+    {
+        ProjectileSpawnMessage message = new ProjectileSpawnMessage
+        {
+            action = "spawnProjectile",
+            data = new ProjectileSpawnData
+            {
+                turretId = turret.gameObject.name,
+                targetId = turret.target.gameObject.name,
+                gameId = PlayerPrefs.GetString("gameId"),
+            },
+            token = PlayerPrefs.GetString("accessToken"),
+        };
+
+        string jsonMessage = JsonUtility.ToJson(message);
+        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+        return;
+    }
+
+    public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, Building building)
+    {
+        BuildingLevelUpMessage message = new BuildingLevelUpMessage
+        {
+            action = "levelUpBuilding",
+            data = new BuildingLevelUpData
+            {
+                gameId = PlayerPrefs.GetString("gameId"),
+                tag = building.gameObject.tag,
+            },
+            token = PlayerPrefs.GetString("accessToken"),
+        };
+
+        string jsonMessage = JsonUtility.ToJson(message);
+        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+        return;
+    }
+
+    public void HandleAdvanceAge(SpawnSide side)
+    {
+        AdvanceAgeMessage message = new AdvanceAgeMessage
+        {
+            action = "advanceAge",
+            data = new AdvanceAgeData
+            {
+                gameId = PlayerPrefs.GetString("gameId"),
+                side = side.ToString(),
+            },
+            token = PlayerPrefs.GetString("accessToken"),
+        };
+
+        string jsonMessage = JsonUtility.ToJson(message);
+        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+        return;
+    }
+}
+
+[System.Serializable]
+public class AttackMessage
+{
+    public string action;
+    public UnitAttackData data;
+    public string token;
+}
+
+[System.Serializable]
+public class UnitAttackData
+{
+    public string attackerId;
+    public string targetId;
+    public int damage;
+
+    public string gameId;
+}
+
+[System.Serializable]
+public class CastleAttackMessage
+{
+    public string action;
+    public CastleAttackData data;
+    public string token;
+}
+[System.Serializable]
+public class CastleAttackData
+{
+    public string gameId;
+    public string attackerId;
+    public string targetSide;
+    public int damage;
+}
+
+[System.Serializable]
+public class ProjectileSpawnMessage
+{
+    public string action;
+    public ProjectileSpawnData data;
+    public string token;
+}
+
+[System.Serializable]
+public class ProjectileSpawnData
+{
+    public string turretId;
+    public string targetId;
+    public string gameId;
+    public float damage;
+}
+
+[System.Serializable]
+public class BuildingLevelUpMessage
+{
+    public string action;
+    public BuildingLevelUpData data;
+    public string token;
+}
+
+[System.Serializable]
+public class BuildingLevelUpData
+{
+    public string gameId;
+    public string tag;
+}
+
+[System.Serializable]
+public class AdvanceAgeMessage
+{
+    public string action;
+    public AdvanceAgeData data;
+    public string token;
+}
+[System.Serializable]
+public class AdvanceAgeData
+{
+    public string gameId;
+    public string side;
 }

@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class Turret : MonoBehaviour
@@ -12,10 +13,13 @@ public class Turret : MonoBehaviour
     public float range = 5.0f;
     public bool isFacingRight = true;
 
-    private Transform target;
+    public Transform target;
     private float fireCooldown = 0.0f;
     private void Start()
     {
+        this.gameObject.name = GUID.Generate().ToString();
+        GameManager.Instance.turretsDictionary.Add(this.gameObject.name, this);
+
         if (isFacingRight)
         {
             oppositeTag = SpawnSide.Right.ToString();
@@ -64,9 +68,21 @@ public class Turret : MonoBehaviour
 
     void Shoot()
     {
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-        projectile.GetComponent<Projectile>().Seek(target);
+        GameManager.Instance.CurrentStrategy.HandleProjectileSpawn(this, projectilePrefab);
         // Set projectile properties (e.g., damage, speed, etc.)
+    }
+
+    public void ShootById(string unitId)
+    {
+        UnitController enemyUnit = GameManager.Instance.unitsDictionary[unitId];
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        projectile.GetComponent<Projectile>().Seek(enemyUnit.transform);
+    }
+
+    public GameObject InstantiateProjectile(GameObject projectilePrefab, Vector3 position, Quaternion rotation)
+    {
+        GameObject projectile = Instantiate(projectilePrefab, position, rotation);
+        return projectile;
     }
 
     void FindClosestEnemy()
@@ -90,5 +106,6 @@ public class Turret : MonoBehaviour
             target = nearestEnemy.transform;
         }
     }
+
 
 }

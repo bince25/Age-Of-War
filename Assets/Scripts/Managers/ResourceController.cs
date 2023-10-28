@@ -27,6 +27,7 @@ public class ResourceController : MonoBehaviour
     public int stoneTankReward;
 
 
+    public int currentAge = 1;
 
     UnitSpawner unitSpawner;
 
@@ -39,6 +40,7 @@ public class ResourceController : MonoBehaviour
     int multiplier = 1;
     public int gold, ageProgression, happiness, food;
     private bool readyForIronAge, readyForMedievalAge, readyForRenaissanceAge, readyForModernAge, readyForFutureAge;
+    private bool readyForNextAge = false;
     void Start()
     {
         unitSpawner = GameObject.FindGameObjectWithTag("GameManager").GetComponent<UnitSpawner>();
@@ -59,8 +61,14 @@ public class ResourceController : MonoBehaviour
         }
         else
         {
+            Debug.Log(unitType);
             switch (unitType)
             {
+                case UnitType.Archer:
+                    IncreaseGold(clubmanReward);
+                    IncreaseAgeProgression(clubmanReward / 2);
+                    IncreaseHappiness(clubmanReward / 10);
+                    break;
                 case UnitType.Clubman:
                     IncreaseGold(clubmanReward);
                     IncreaseAgeProgression(clubmanReward / 2);
@@ -87,30 +95,43 @@ public class ResourceController : MonoBehaviour
 
     public void nextAge()
     {
-        if (readyForIronAge)
+        if (readyForNextAge)
         {
-            ageText.text = Ages.Iron.ToString() + " Age";
+            Debug.Log("Next age");
+            GameManager.Instance.CurrentStrategy.HandleAdvanceAge(playerSide);
+            CheckReadyForNextAge(); // Reset the readyForNextAge flag
         }
-        if (readyForMedievalAge)
-        {
-            ageText.text = Ages.Medieval.ToString() + " Age";
-        }
-        if (readyForRenaissanceAge)
-        {
-            ageText.text = Ages.Renaissance.ToString() + " Age";
-        }
-        if (readyForModernAge)
-        {
-            ageText.text = Ages.Modern.ToString() + " Age";
-        }
-        unitSpawner.canSpawnMountedUnit = false;
-        unitSpawner.canSpawnTankUnit = false;
-        unitSpawner.canSpawnSiegeUnit = false;
-        if (readyForFutureAge)
-        {
-            ageText.text = Ages.Future.ToString() + " Age";
-        }
+    }
 
+    void CheckReadyForNextAge()
+    {
+        switch (currentAge)
+        {
+            case 1: // Stone Age
+                readyForNextAge = ageProgression >= Constants.TO_IRON_AGE;
+                ageGoalText.text = Constants.TO_IRON_AGE.ToString();
+                break;
+            case 2: // Iron Age
+                readyForNextAge = ageProgression >= Constants.TO_MEDIEVAL_AGE;
+                ageGoalText.text = Constants.TO_MEDIEVAL_AGE.ToString();
+                break;
+            case 3: // Medieval Age
+                readyForNextAge = ageProgression >= Constants.TO_RENAISSANCE_AGE;
+                ageGoalText.text = Constants.TO_RENAISSANCE_AGE.ToString();
+                break;
+            case 4: // Renaissance Age
+                readyForNextAge = ageProgression >= Constants.TO_MODERN_AGE;
+                ageGoalText.text = Constants.TO_MODERN_AGE.ToString();
+                break;
+            case 5: // Modern Age
+                readyForNextAge = ageProgression >= Constants.TO_FUTURE_AGE;
+                ageGoalText.text = Constants.TO_FUTURE_AGE.ToString();
+                break;
+            default:
+                readyForNextAge = false;
+                ageGoalText.text = "----";
+                break;
+        }
     }
 
     void UpdateTextColor(TextMeshProUGUI text, int amount)
@@ -155,33 +176,10 @@ public class ResourceController : MonoBehaviour
     }
     public void IncreaseAgeProgression(int amount)
     {
+        Debug.Log("Age progression increased by " + amount);
         ageProgression += amount;
         ageProgressionText.text = ageProgression.ToString();
-        if (ageProgression >= Constants.TO_IRON_AGE)
-        {
-            ageGoalText.text = Constants.TO_MEDIEVAL_AGE.ToString();
-            readyForIronAge = true;
-        }
-        if (ageProgression >= Constants.TO_MEDIEVAL_AGE)
-        {
-            ageGoalText.text = Constants.TO_RENAISSANCE_AGE.ToString();
-            readyForMedievalAge = true;
-        }
-        if (ageProgression >= Constants.TO_RENAISSANCE_AGE)
-        {
-            ageGoalText.text = Constants.TO_MODERN_AGE.ToString();
-            readyForRenaissanceAge = true;
-        }
-        if (ageProgression >= Constants.TO_MODERN_AGE)
-        {
-            ageGoalText.text = Constants.TO_FUTURE_AGE.ToString();
-            readyForModernAge = true;
-        }
-        if (ageProgression >= Constants.TO_FUTURE_AGE)
-        {
-            ageGoalText.text = "----";
-            readyForFutureAge = true;
-        }
+        CheckReadyForNextAge();
     }
     public void IncreaseHappiness(int amount)
     {

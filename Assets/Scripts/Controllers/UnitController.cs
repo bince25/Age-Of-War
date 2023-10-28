@@ -54,10 +54,11 @@ public class UnitController : MonoBehaviour
     private UnitState currentState = UnitState.Walking;
 
     private GameObject currentTarget;
+    private ResourceController resourceController;
 
     private void Start()
     {
-
+        resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
         if (isFacingRight)
         {
             oppositeTag = SpawnSide.Right.ToString();
@@ -134,17 +135,15 @@ public class UnitController : MonoBehaviour
                         isRunning = false;
                         break;
                     }
-                    if (currentTarget.GetComponent<Castle>() != null)
+
+                    if (!CheckFront())
                     {
-                        if (!CheckFront())
-                        {
-                            currentState = UnitState.Walking;
-                            isStopped = false;
-                            isAnimating = false;
-                            Run();
-                            isRunning = false;
-                            break;
-                        }
+                        currentState = UnitState.Walking;
+                        isStopped = false;
+                        isAnimating = false;
+                        Run();
+                        isRunning = false;
+                        break;
                     }
                     break;
                 case UnitState.Idle:
@@ -156,7 +155,10 @@ public class UnitController : MonoBehaviour
                     bool enemyDetected = false;
                     foreach (var hitCollider in hitColliders)
                     {
-                        if ((hitCollider.gameObject.tag == oppositeTag) || (hitCollider.gameObject.tag == gameObject.tag && hitCollider.gameObject != this.gameObject))
+                        if ((hitCollider.gameObject.tag == oppositeTag)
+                        || (hitCollider.gameObject.tag == gameObject.tag
+                        && hitCollider.gameObject != this.gameObject
+                        ))
                         {
                             detected = true;
 
@@ -166,7 +168,23 @@ public class UnitController : MonoBehaviour
                                 currentTarget = hitCollider.gameObject;
                             }
 
-                            break;
+                            if (!enemyDetected)
+                            {
+                                if (isFacingRight && hitCollider.gameObject.transform.position.x < transform.position.x ||
+                                    !isFacingRight && hitCollider.gameObject.transform.position.x > transform.position.x)
+                                {
+                                    detected = false;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+
                         }
                     }
                     if (!detected)
@@ -452,12 +470,10 @@ public class UnitController : MonoBehaviour
         // Disable the collider
         if (_collider) _collider.enabled = false;
 
+        resourceController.UnitDied(gameObject.tag, this.unitType);
         // Deactivate the game object immediately and then destroy it after the death animation
         gameObject.SetActive(false);
-        Destroy(gameObject, 0.2f);// Destroy the unit after 1 second
-
-        ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
-        resourceController.UnitDied(gameObject.tag, this.unitType);
+        Destroy(gameObject, GetAnimationLength("death"));// Destroy the unit after 1 second
     }
 
     public float GetAnimationLength(string name)
@@ -472,37 +488,4 @@ public class UnitController : MonoBehaviour
         return 0f; // Return 0 if no animation with that name is found.
     }
 
-}
-[System.Serializable]
-public class AttackMessage
-{
-    public string action;
-    public UnitAttackData data;
-    public string token;
-}
-
-[System.Serializable]
-public class UnitAttackData
-{
-    public string attackerId;
-    public string targetId;
-    public int damage;
-
-    public string gameId;
-}
-
-[System.Serializable]
-public class CastleAttackMessage
-{
-    public string action;
-    public CastleAttackData data;
-    public string token;
-}
-[System.Serializable]
-public class CastleAttackData
-{
-    public string gameId;
-    public string attackerId;
-    public string targetSide;
-    public int damage;
 }

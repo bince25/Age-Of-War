@@ -12,6 +12,7 @@ public class WebSocketEvents : MonoBehaviour
     private GameObject gameManager;
 
     private UnitSpawner unitSpawner;
+    private ResourceController resourceController;
     public static WebSocketEvents Instance { get; private set; }
 
     private void Awake()
@@ -31,6 +32,7 @@ public class WebSocketEvents : MonoBehaviour
 
     private void Start()
     {
+        resourceController = GameObject.FindGameObjectWithTag("LeftCastle").GetComponent<ResourceController>();
         unitSpawner = gameManager.GetComponent<UnitSpawner>();
     }
 
@@ -59,6 +61,7 @@ public class WebSocketEvents : MonoBehaviour
                 GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].id = rightCastle.id;
                 GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].currentHealth = rightCastle.health;
                 GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].maxHealth = rightCastle.health;
+
                 break;
             case "unitSpawned":
                 Debug.Log("Unit spawned");
@@ -79,6 +82,26 @@ public class WebSocketEvents : MonoBehaviour
             case "unitDied":
                 Debug.Log("Unit died");
                 GameManager.Instance.unitsDictionary[wsMessage.data["unitId"].ToString()].Death();
+                break;
+            case "projectileSent":
+                Debug.Log("Projectile sent");
+                ProjectileSentMessage projectileSentMessage = wsMessage.data.ToObject<ProjectileSentMessage>();
+                GameManager.Instance.turretsDictionary[projectileSentMessage.turretId].ShootById(projectileSentMessage.targetId);
+                break;
+            case "ageAdvanced":
+                Debug.Log("Age advanced");
+                AgeUpMessage ageUpMessage = wsMessage.data.ToObject<AgeUpMessage>();
+                if (ageUpMessage.side == SpawnSide.Left.ToString())
+                {
+                    GameStateManager.Instance.leftAge = (Ages)ageUpMessage.age;
+
+                    resourceController.ageText.text = GameStateManager.Instance.leftAge.ToString() + " Age";
+                    resourceController.currentAge++;
+                }
+                else
+                {
+                    GameStateManager.Instance.rightAge = (Ages)ageUpMessage.age;
+                }
                 break;
         }
 
@@ -129,4 +152,25 @@ public class CastleAttackedMessage
 {
     public string side;
     public int damage;
+}
+
+[System.Serializable]
+public class UnitDiedMessage
+{
+    public string unitId;
+}
+
+[System.Serializable]
+public class ProjectileSentMessage
+{
+    public string turretId;
+    public string targetId;
+    public string gameId;
+}
+
+[System.Serializable]
+public class AgeUpMessage
+{
+    public string side;
+    public int age;
 }

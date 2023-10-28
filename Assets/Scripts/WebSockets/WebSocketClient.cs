@@ -5,6 +5,8 @@ using System;
 
 public class WebSocketClient : MonoBehaviour
 {
+    private string websocketUrl;
+
     public static WebSocketClient Instance { get; private set; }
 
     private WebSocket websocket;
@@ -24,9 +26,22 @@ public class WebSocketClient : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (NetworkManager.Instance.networkEnviroment == NetworkEnviroment.Development)
+        {
+            websocketUrl = "ws://" + NetworkManager.Instance.baseApiUrl + "/game/ws";
+        }
+        else
+        {
+            // Change this to wss
+            websocketUrl = "ws://" + NetworkManager.Instance.baseApiUrl + "/game/ws";
+        }
+    }
+
     public async void ConnectToWebSocket()
     {
-        websocket = new WebSocket("ws://167.172.105.111/game/ws");
+        websocket = new WebSocket(websocketUrl);
 
         websocket.OnOpen += () =>
         {

@@ -1,5 +1,6 @@
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class Building : MonoBehaviour
@@ -65,6 +66,8 @@ public class Building : MonoBehaviour
     // Update is called once per frame
     void Start()
     {
+        gameObject.name = GUID.Generate().ToString();
+        GameManager.Instance.buildingsDictionary.Add(gameObject.name, this);
         switch (buildingType)
         {
             case BuildingType.Farm:
@@ -109,101 +112,15 @@ public class Building : MonoBehaviour
     //--------------------------------------------------------------------------------------------------------
     public void LevelUp()
     {
-        Debug.Log(buildingType + " Leveled Up!");
-        if (this.buildingType == BuildingType.Farm)
-        {
-            farmLevel++;
-            farmGoldMultiplier *= 1.2f;
-            farmFoodMultiplier *= 1.4f;
-            ChangeFarmMultiplier(farmGoldMultiplier);
-        }
-        else if (this.buildingType == BuildingType.Barrack)
-        {
-            barrackLevel++;
-            if (barrackLevel == 1 && resourceController.ageText.text == Ages.Stone.ToString() + " Age")
-            {
-                unitSpawner.canSpawnTankUnit = true;
-            }
-            else if (barrackLevel == 2 && resourceController.ageText.text == Ages.Iron.ToString() + " Age")
-            {
-                unitSpawner.canSpawnTankUnit = true;
-            }
-            else if (barrackLevel == 3 && resourceController.ageText.text == Ages.Medieval.ToString() + " Age")
-            {
-                unitSpawner.canSpawnTankUnit = true;
-            }
-            else if (barrackLevel == 4 && resourceController.ageText.text == Ages.Renaissance.ToString() + " Age")
-            {
-                unitSpawner.canSpawnTankUnit = true;
-            }
-            else if (barrackLevel == 5 && resourceController.ageText.text == Ages.Modern.ToString() + " Age")
-            {
-                unitSpawner.canSpawnTankUnit = true;
-            }
-            else if (barrackLevel == 6 && resourceController.ageText.text == Ages.Future.ToString() + " Age")
-            {
-                unitSpawner.canSpawnTankUnit = true;
-            }
-            else
-            {
-                unitSpawner.canSpawnTankUnit = false;
-            }
-        }
-        else if (this.buildingType == BuildingType.Stable)
-        {
-            stableLevel++;
-            if (stableLevel == 1 && resourceController.ageText.text == Ages.Iron.ToString() + " Age")
-            {
-                unitSpawner.canSpawnMountedUnit = true;
-            }
-            else if (stableLevel == 2 && resourceController.ageText.text == Ages.Medieval.ToString() + " Age")
-            {
-                unitSpawner.canSpawnMountedUnit = true;
-            }
-            else if (stableLevel == 3 && resourceController.ageText.text == Ages.Renaissance.ToString() + " Age")
-            {
-                unitSpawner.canSpawnMountedUnit = true;
-            }
-            else if (stableLevel == 4 && resourceController.ageText.text == Ages.Modern.ToString() + " Age")
-            {
-                unitSpawner.canSpawnMountedUnit = true;
-            }
-            else if (stableLevel == 5 && resourceController.ageText.text == Ages.Future.ToString() + " Age")
-            {
-                unitSpawner.canSpawnMountedUnit = true;
-            }
-            else
-            {
-                unitSpawner.canSpawnMountedUnit = false;
-            }
-        }
-        else if (this.buildingType == BuildingType.Workshop)
-        {
-            workshopLevel++;
-            if (workshopLevel == 1 && resourceController.ageText.text == Ages.Iron.ToString() + " Age")
-            {
-                unitSpawner.canSpawnSiegeUnit = true;
-            }
-            else if (workshopLevel == 2 && resourceController.ageText.text == Ages.Medieval.ToString() + " Age")
-            {
-                unitSpawner.canSpawnSiegeUnit = true;
-            }
-            else if (workshopLevel == 3 && resourceController.ageText.text == Ages.Renaissance.ToString() + " Age")
-            {
-                unitSpawner.canSpawnSiegeUnit = true;
-            }
-            else if (workshopLevel == 4 && resourceController.ageText.text == Ages.Modern.ToString() + " Age")
-            {
-                unitSpawner.canSpawnSiegeUnit = true;
-            }
-            else if (workshopLevel == 5 && resourceController.ageText.text == Ages.Future.ToString() + " Age")
-            {
-                unitSpawner.canSpawnSiegeUnit = true;
-            }
-            else
-            {
-                unitSpawner.canSpawnSiegeUnit = false;
-            }
-        }
+        GameManager.Instance.CurrentStrategy.HandleBuildingLevelUp(unitSpawner, resourceController, this);
     }
+}
+
+[System.Serializable]
+public class BuildingData
+{
+    public string id;
+    public string type;
+    public string side;
+    public int level;
 }

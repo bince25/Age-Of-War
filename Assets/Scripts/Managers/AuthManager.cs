@@ -5,7 +5,7 @@ public class AuthManager : MonoBehaviour
 {
     public static AuthManager Instance { get; private set; }
 
-    private string apiUrl = "http://167.172.105.111/api/auth";
+    private string apiUrl;
     private string accessToken;
 
     private void Awake()
@@ -21,10 +21,26 @@ public class AuthManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (NetworkManager.Instance.networkEnviroment == NetworkEnviroment.Development)
+        {
+            apiUrl = "http://" + NetworkManager.Instance.baseApiUrl + "/api/auth";
+
+        }
+        else
+        {
+            // Change this to https
+            apiUrl = "http://" + NetworkManager.Instance.baseApiUrl + "/api/auth";
+        }
+    }
+
     public void DefaultLogin(Action onSuccess)
     {
         string username = "menes";
         string password = "12345";
+
+        Debug.Log(apiUrl);
 
         HttpRequestHelper.Instance.PostRequest(apiUrl + "/login",
             $"{{\"username\":\"{username}\",\"password\":\"{password}\"}}",

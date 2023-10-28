@@ -8625,6 +8625,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: RightCastle
       objectReference: {fileID: 0}
+    - target: {fileID: 1621433461253004204, guid: 80f0f7f191cf44f4b84d188c847b575f, type: 3}
+      propertyPath: spawnSide
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1777582244586288781, guid: 80f0f7f191cf44f4b84d188c847b575f, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -12885,6 +12889,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1570136792}
+  - component: {fileID: 1570136793}
   - component: {fileID: 1570136791}
   - component: {fileID: 1570136790}
   - component: {fileID: 1570136789}
@@ -12960,6 +12965,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1570136793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570136787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0a28f7d493e34767b575bf6213e2833, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkEnviroment: 0
+  baseApiUrl: 167.172.105.111
+  baseDevelopmentApiUrl: localhost:8080
+  baseProductionApiUrl: 167.172.105.111
 --- !u!1 &1571574605
 GameObject:
   m_ObjectHideFlags: 0

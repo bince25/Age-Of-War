@@ -43,5 +43,128 @@ public class LocalGameStrategy : IGameStrategy
             castle.TakeDamage(attacker.attackDamage);
         }
     }
+    public void HandleProjectileSpawn(Turret turret, GameObject entityPrefab)
+    {
+        GameObject projectile = turret.InstantiateProjectile(entityPrefab, turret.firePoint.position, turret.firePoint.rotation);
+        projectile.GetComponent<Projectile>().Seek(turret.target);
+    }
+
+    public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, Building building)
+    {
+        Debug.Log(building.buildingType + " Leveled Up!");
+        if (building.buildingType == BuildingType.Farm)
+        {
+            building.farmLevel++;
+            building.farmGoldMultiplier *= 1.2f;
+            building.farmFoodMultiplier *= 1.4f;
+            building.ChangeFarmMultiplier(building.farmGoldMultiplier);
+        }
+        else if (building.buildingType == BuildingType.Barrack)
+        {
+            building.barrackLevel++;
+            if (building.barrackLevel == 1 && resourceController.ageText.text == Ages.Stone.ToString() + " Age")
+            {
+                unitSpawner.canSpawnTankUnit = true;
+            }
+            else if (building.barrackLevel == 2 && resourceController.ageText.text == Ages.Iron.ToString() + " Age")
+            {
+                unitSpawner.canSpawnTankUnit = true;
+            }
+            else if (building.barrackLevel == 3 && resourceController.ageText.text == Ages.Medieval.ToString() + " Age")
+            {
+                unitSpawner.canSpawnTankUnit = true;
+            }
+            else if (building.barrackLevel == 4 && resourceController.ageText.text == Ages.Renaissance.ToString() + " Age")
+            {
+                unitSpawner.canSpawnTankUnit = true;
+            }
+            else if (building.barrackLevel == 5 && resourceController.ageText.text == Ages.Modern.ToString() + " Age")
+            {
+                unitSpawner.canSpawnTankUnit = true;
+            }
+            else if (building.barrackLevel == 6 && resourceController.ageText.text == Ages.Future.ToString() + " Age")
+            {
+                unitSpawner.canSpawnTankUnit = true;
+            }
+            else
+            {
+                unitSpawner.canSpawnTankUnit = false;
+            }
+        }
+        else if (building.buildingType == BuildingType.Stable)
+        {
+            building.stableLevel++;
+            if (building.stableLevel == 1 && resourceController.ageText.text == Ages.Iron.ToString() + " Age")
+            {
+                unitSpawner.canSpawnMountedUnit = true;
+            }
+            else if (building.stableLevel == 2 && resourceController.ageText.text == Ages.Medieval.ToString() + " Age")
+            {
+                unitSpawner.canSpawnMountedUnit = true;
+            }
+            else if (building.stableLevel == 3 && resourceController.ageText.text == Ages.Renaissance.ToString() + " Age")
+            {
+                unitSpawner.canSpawnMountedUnit = true;
+            }
+            else if (building.stableLevel == 4 && resourceController.ageText.text == Ages.Modern.ToString() + " Age")
+            {
+                unitSpawner.canSpawnMountedUnit = true;
+            }
+            else if (building.stableLevel == 5 && resourceController.ageText.text == Ages.Future.ToString() + " Age")
+            {
+                unitSpawner.canSpawnMountedUnit = true;
+            }
+            else
+            {
+                unitSpawner.canSpawnMountedUnit = false;
+            }
+        }
+        else if (building.buildingType == BuildingType.Workshop)
+        {
+            building.workshopLevel++;
+            if (building.workshopLevel == 1 && resourceController.ageText.text == Ages.Iron.ToString() + " Age")
+            {
+                unitSpawner.canSpawnSiegeUnit = true;
+            }
+            else if (building.workshopLevel == 2 && resourceController.ageText.text == Ages.Medieval.ToString() + " Age")
+            {
+                unitSpawner.canSpawnSiegeUnit = true;
+            }
+            else if (building.workshopLevel == 3 && resourceController.ageText.text == Ages.Renaissance.ToString() + " Age")
+            {
+                unitSpawner.canSpawnSiegeUnit = true;
+            }
+            else if (building.workshopLevel == 4 && resourceController.ageText.text == Ages.Modern.ToString() + " Age")
+            {
+                unitSpawner.canSpawnSiegeUnit = true;
+            }
+            else if (building.workshopLevel == 5 && resourceController.ageText.text == Ages.Future.ToString() + " Age")
+            {
+                unitSpawner.canSpawnSiegeUnit = true;
+            }
+            else
+            {
+                unitSpawner.canSpawnSiegeUnit = false;
+            }
+        }
+    }
+
+    public void HandleAdvanceAge(SpawnSide side)
+    {
+        ResourceController resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
+        if (side == SpawnSide.Left)
+        {
+            GameStateManager.Instance.leftAge++;
+            resourceController.currentAge++;
+            resourceController.ageText.text = GameStateManager.Instance.leftAge.ToString() + " Age";
+        }
+        else
+        {
+            resourceController.currentAge++;
+            GameStateManager.Instance.rightAge++;
+            resourceController.ageText.text = GameStateManager.Instance.rightAge.ToString() + " Age";
+        }
+
+    }
 }
 

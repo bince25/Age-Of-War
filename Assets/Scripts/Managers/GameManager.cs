@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<string, Castle> castlesDictionary = new Dictionary<string, Castle>();
 
+    public Dictionary<string, Turret> turretsDictionary = new Dictionary<string, Turret>();
+    public Dictionary<string, Building> buildingsDictionary = new Dictionary<string, Building>();
+
     private void Awake()
     {
         if (Instance == null)

@@ -13,7 +13,24 @@ public class GameStateManager : MonoBehaviour
 
     private TextMeshProUGUI ageGoalText;
     [SerializeField]
-    private Ages leftAge, rightAge;
+    public Ages leftAge, rightAge;
+
+    public SpawnSide playerSide = SpawnSide.Left;
+
+    public static GameStateManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -42,12 +59,27 @@ public class GameStateManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
+            BuildingData[] buildings = new BuildingData[GameManager.Instance.buildingsDictionary.Count];
+            int i = 0;
+            foreach (KeyValuePair<string, Building> entry in GameManager.Instance.buildingsDictionary)
+            {
+                buildings[i] = new BuildingData
+                {
+                    id = entry.Key,
+                    type = entry.Value.buildingType.ToString(),
+                    side = entry.Value.gameObject.tag,
+                    level = 0
+                };
+                i++;
+            }
+
             GameMessage message = new GameMessage
             {
                 action = "startGame",
                 data = new GameData
                 {
                     attackerId = this.gameObject.name, // or some unique ID for the unit
+                    buildings = buildings,
                 },
                 token = PlayerPrefs.GetString("accessToken")
             };
@@ -75,4 +107,5 @@ public class GameMessage
 public class GameData
 {
     public string attackerId;
+    public BuildingData[] buildings;
 }
