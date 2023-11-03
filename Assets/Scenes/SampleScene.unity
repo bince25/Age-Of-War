@@ -6028,6 +6028,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingType: 0
+  built: 0
   isBarrack: 0
   isFarm: 0
   isStable: 0
@@ -6744,6 +6745,7 @@ MonoBehaviour:
   rightWinText: {fileID: 417562992}
   leftAge: 0
   rightAge: 0
+  playerSide: 0
 --- !u!114 &783853877
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6770,6 +6772,7 @@ MonoBehaviour:
   clubmanReward: 10
   slingerReward: 9
   stoneTankReward: 12
+  currentAge: 1
   resourceSprites:
   - {fileID: -925201034, guid: a0eaadb6b3bd05244afb3a2d2a6f8a53, type: 3}
   - {fileID: -1913381549, guid: a0eaadb6b3bd05244afb3a2d2a6f8a53, type: 3}
@@ -12977,7 +12980,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a28f7d493e34767b575bf6213e2833, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkEnviroment: 0
+  networkEnviroment: 1
   baseApiUrl: 167.172.105.111
   baseDevelopmentApiUrl: localhost:8080
   baseProductionApiUrl: 167.172.105.111
@@ -13326,6 +13329,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingType: 0
+  built: 0
   isBarrack: 0
   isFarm: 0
   isStable: 1
@@ -14268,6 +14272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingType: 0
+  built: 0
   isBarrack: 0
   isFarm: 1
   isStable: 0
@@ -18260,6 +18265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingType: 0
+  built: 0
   isBarrack: 1
   isFarm: 0
   isStable: 0
