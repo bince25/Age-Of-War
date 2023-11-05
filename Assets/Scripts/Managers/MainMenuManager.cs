@@ -16,24 +16,84 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField]
     private LoadingScreen loadingScreen;
 
+    public UIManager uiManager;
+
+    private Stack<GameState> stateHistory = new Stack<GameState>();
+    private GameState currentState;
+
     private void Awake()
     {
         modalController = modalControllerObject.GetComponent<ModalController>();
+        ChangeState(GameState.Login);
     }
+
+    // Method to change state with history tracking
+    public void ChangeState(GameState newState, bool storeCurrentState = true)
+    {
+        if (storeCurrentState)
+        {
+            if (currentState != GameState.Login)
+                stateHistory.Push(currentState);
+        }
+
+        currentState = newState;
+        UpdateUIBasedOnState();
+    }
+
+    // Method to revert to the previous state
+    public void GoBack()
+    {
+        if (stateHistory.Count > 0)
+        {
+            GameState previousState = stateHistory.Pop();
+            // Don't store the current state since we are popping off the stack
+            ChangeState(previousState, storeCurrentState: false);
+        }
+    }
+
+    // Call this when you need to update the UI based on the new state
+    private void UpdateUIBasedOnState()
+    {
+        Debug.Log(currentState);
+        // Open the appropriate panel
+        switch (currentState)
+        {
+            case GameState.Login:
+                uiManager.ShowPanel(uiManager.loginPanel);
+                break;
+            case GameState.MainMenu:
+                uiManager.ShowPanel(uiManager.mainMenuPanel);
+                break;
+            case GameState.GameModeSelect:
+                uiManager.ShowPanel(uiManager.gameModePanel);
+                break;
+        }
+    }
+
 
     public void Login()
     {
         AuthManager.Instance.LogInWithUsernamePassword(mail.text, password.text, () =>
         {
             Debug.Log("Logged in successfully!");
-            loginPanel.SetActive(false);
-            mainmenuPanel.SetActive(true);
+            ChangeState(GameState.MainMenu);
         }, () =>
         {
             Debug.LogError("Login failed!");
             modalController.ShowModal("Login failed!", "Please check your credentials and try again.");
         });
     }
+
+    public void SelectGameMode()
+    {
+        ChangeState(GameState.GameModeSelect);
+    }
+
+    public void JoinGame()
+    {
+        ChangeState(GameState.JoinGame);
+    }
+
     public void OpenCountriesPanel()
     {
         countriesPanel.SetActive(true);
