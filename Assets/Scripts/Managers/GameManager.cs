@@ -14,10 +14,10 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<string, UnitController> unitsDictionary = new Dictionary<string, UnitController>();
 
-    public Dictionary<string, Castle> castlesDictionary = new Dictionary<string, Castle>();
+    public Dictionary<string, CastleController> castlesDictionary = new Dictionary<string, CastleController>();
 
     public Dictionary<string, Turret> turretsDictionary = new Dictionary<string, Turret>();
-    public Dictionary<string, Building> buildingsDictionary = new Dictionary<string, Building>();
+    public Dictionary<string, BuildingController> buildingsDictionary = new Dictionary<string, BuildingController>();
 
     private void Awake()
     {
@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         SetGameStrategy(new LocalGameStrategy());
-        castlesDictionary.Add(SpawnSide.LeftCastle.ToString(), leftCastle.GetComponent<Castle>());
-        castlesDictionary.Add(SpawnSide.RightCastle.ToString(), rightCastle.GetComponent<Castle>());
+        castlesDictionary.Add(SpawnSide.LeftCastle.ToString(), leftCastle.GetComponent<CastleController>());
+        castlesDictionary.Add(SpawnSide.RightCastle.ToString(), rightCastle.GetComponent<CastleController>());
     }
 
     void Update()

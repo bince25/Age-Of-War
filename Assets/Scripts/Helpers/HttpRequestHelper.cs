@@ -34,6 +34,13 @@ public class HttpRequestHelper : MonoBehaviour
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
 
+            // Place JWT token in the header
+            string jwt_token = PlayerPrefs.GetString("accessToken");
+            if (!string.IsNullOrEmpty(jwt_token))
+            {
+                www.SetRequestHeader("Authorization", "Bearer " + jwt_token);
+            }
+
             yield return www.SendWebRequest();
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
@@ -43,7 +50,6 @@ public class HttpRequestHelper : MonoBehaviour
             else
             {
                 // Extract the Set-Cookie header
-                // Extract the Set-Cookie header
                 string cookieValue = www.GetResponseHeader("Set-Cookie");
                 if (!string.IsNullOrEmpty(cookieValue))
                 {
@@ -52,8 +58,8 @@ public class HttpRequestHelper : MonoBehaviour
 
                     // Remove the "access_token=" prefix
                     string token = tokenWithPrefix.Replace("access_token=", "");
-
-                    PlayerPrefs.SetString("accessToken", token);
+                    if (!string.IsNullOrEmpty(token) && token != "")
+                        PlayerPrefs.SetString("accessToken", token);
                 }
 
                 onComplete?.Invoke(www.downloadHandler.text);

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Castle : MonoBehaviour
+public class CastleController : MonoBehaviour
 {
     public string id;
     public int maxHealth = 100;

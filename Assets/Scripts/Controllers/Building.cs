@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-public class Building : MonoBehaviour
+public class BuildingController : MonoBehaviour
 {
     public BuildingType buildingType;
     private ResourceController resourceController;
@@ -43,23 +43,23 @@ public class Building : MonoBehaviour
         {
             case "LeftFarm":
             case "RightFarm":
-                gameObject.GetComponent<Building>().buildingType = BuildingType.Farm;
+                gameObject.GetComponent<BuildingController>().buildingType = BuildingType.Farm;
                 this.farmLevel = 1;
                 farmGoldMultiplier = 1;
                 break;
             case "LeftBarrack":
             case "RightBarrack":
-                gameObject.GetComponent<Building>().buildingType = BuildingType.Barrack;
+                gameObject.GetComponent<BuildingController>().buildingType = BuildingType.Barrack;
                 this.barrackLevel = 0;
                 break;
             case "LeftStable":
             case "RightStable":
-                gameObject.GetComponent<Building>().buildingType = BuildingType.Stable;
+                gameObject.GetComponent<BuildingController>().buildingType = BuildingType.Stable;
                 this.stableLevel = 0;
                 break;
             case "LeftWorkshop":
             case "RightWorkshop":
-                gameObject.GetComponent<Building>().buildingType = BuildingType.Workshop;
+                gameObject.GetComponent<BuildingController>().buildingType = BuildingType.Workshop;
                 this.workshopLevel = 0;
                 break;
         }

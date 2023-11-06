@@ -41,15 +41,15 @@ public class GameStateManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (leftCastle.GetComponent<Castle>().currentHealth <= 0)
+        if (leftCastle.GetComponent<CastleController>().currentHealth <= 0)
         {
-            leftCastle.GetComponent<Castle>().currentHealth = 0;
+            leftCastle.GetComponent<CastleController>().currentHealth = 0;
             gameOverPanel.SetActive(true);
             rightWinText.SetActive(true);
         }
-        else if (rightCastle.GetComponent<Castle>().currentHealth <= 0)
+        else if (rightCastle.GetComponent<CastleController>().currentHealth <= 0)
         {
-            rightCastle.GetComponent<Castle>().currentHealth = 0;
+            rightCastle.GetComponent<CastleController>().currentHealth = 0;
             gameOverPanel.SetActive(true);
             leftWinText.SetActive(true);
         }
@@ -61,7 +61,7 @@ public class GameStateManager : MonoBehaviour
         {
             BuildingData[] buildings = new BuildingData[GameManager.Instance.buildingsDictionary.Count];
             int i = 0;
-            foreach (KeyValuePair<string, Building> entry in GameManager.Instance.buildingsDictionary)
+            foreach (KeyValuePair<string, BuildingController> entry in GameManager.Instance.buildingsDictionary)
             {
                 buildings[i] = new BuildingData
                 {

@@ -32,11 +32,15 @@ public class WebSocketEvents : MonoBehaviour
 
     private void Start()
     {
-        resourceController = GameObject.FindGameObjectWithTag("LeftCastle").GetComponent<ResourceController>();
-        unitSpawner = gameManager.GetComponent<UnitSpawner>();
+
+        if (gameManager != null)
+        {
+            resourceController = GameObject.FindGameObjectWithTag("LeftCastle").GetComponent<ResourceController>();
+            unitSpawner = gameManager.GetComponent<UnitSpawner>();
+        }
     }
 
-    public void HandleMessage(string message)
+    public void HandleGameMessage(string message)
     {
         WSMessage wsMessage = JsonConvert.DeserializeObject<WSMessage>(message);
 
@@ -76,7 +80,7 @@ public class WebSocketEvents : MonoBehaviour
                 GameManager.Instance.unitsDictionary[unitAttackedMessage.targetId].AttackUnitByID(unitAttackedMessage.targetId, unitAttackedMessage.damage);
                 break;
             case "castleAttacked":
-                Debug.Log("Castle attacked");
+                Debug.Log("CastleController attacked");
                 GameManager.Instance.castlesDictionary[wsMessage.data["targetSide"].ToString()].TakeDamage((int)wsMessage.data["damage"]);
                 break;
             case "unitDied":
@@ -104,12 +108,12 @@ public class WebSocketEvents : MonoBehaviour
                 }
                 break;
             case "buildingUpgraded":
-                Debug.Log("Building upgraded");
+                Debug.Log("BuildingController upgraded");
                 BuildingMessage buildingMessage_ = wsMessage.data.ToObject<BuildingMessage>();
                 GameManager.Instance.buildingsDictionary[buildingMessage_.id].HandleLevelUp();
                 break;
             case "buildingCreated":
-                Debug.Log("Building created");
+                Debug.Log("BuildingController created");
                 BuildingMessage buildingMessage = wsMessage.data.ToObject<BuildingMessage>();
                 GameManager.Instance.buildingsDictionary[buildingMessage.id].HandleLevelUp();
                 break;
@@ -119,14 +123,57 @@ public class WebSocketEvents : MonoBehaviour
 
                 if (gameOverMessage.targetSide == SpawnSide.LeftCastle.ToString())
                 {
-                    GameManager.Instance.castlesDictionary[SpawnSide.LeftCastle.ToString()].GetComponent<Castle>().currentHealth = 0;
-                    GameManager.Instance.castlesDictionary[SpawnSide.Left.ToString()].GetComponent<Castle>().healthBar.SetHealth(0);
+                    GameManager.Instance.castlesDictionary[SpawnSide.LeftCastle.ToString()].GetComponent<CastleController>().currentHealth = 0;
+                    GameManager.Instance.castlesDictionary[SpawnSide.Left.ToString()].GetComponent<CastleController>().healthBar.SetHealth(0);
                 }
                 else
                 {
-                    GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].GetComponent<Castle>().currentHealth = 0;
-                    GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].GetComponent<Castle>().healthBar.SetHealth(0);
+                    GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].GetComponent<CastleController>().currentHealth = 0;
+                    GameManager.Instance.castlesDictionary[SpawnSide.RightCastle.ToString()].GetComponent<CastleController>().healthBar.SetHealth(0);
                 }
+                break;
+        }
+
+    }
+
+    public void HandleLobbyMessage(string message)
+    {
+        WSMessage wsMessage = JsonConvert.DeserializeObject<WSMessage>(message);
+        Debug.Log("Lobby message: " + wsMessage.action);
+        switch (wsMessage.action)
+        {
+            case "connectedToLobby":
+                Debug.Log("Connected to Lobby");
+                Debug.Log(wsMessage.data);
+                ConnectedToLobbyMessage response = wsMessage.data.ToObject<ConnectedToLobbyMessage>();
+                LobbyStateManager.Instance.lobby = response.lobby;
+                LobbyStateManager.Instance.invitationCodeText.text = response.lobby.invitationCode;
+                LoadingScreen.Instance.HideLoadingPanel();
+                UIManager.Instance.ShowPanel(UIManager.Instance.lobbyPanel);
+                break;
+            case "selectedCountry":
+                Debug.Log("Selected country");
+                SelectedCountryMessage selectedCountryMessage = wsMessage.data.ToObject<SelectedCountryMessage>();
+                Debug.Log("Country ID: " + selectedCountryMessage.countryId);
+                CountryManager.Instance.HandleCountryUpdate((Country)selectedCountryMessage.countryId);
+                break;
+            case "toggledReady":
+                Debug.Log("Toggled ready");
+                ToggledReadyMessage toggledReadyMessage = wsMessage.data.ToObject<ToggledReadyMessage>();
+                Debug.Log("Side: " + toggledReadyMessage.side);
+                if (toggledReadyMessage.side == (int)SpawnSide.Left)
+                {
+                    LobbyStateManager.Instance.ready = toggledReadyMessage.ready;
+                }
+                else
+                {
+                    LobbyStateManager.Instance.opponentReady = toggledReadyMessage.ready;
+                }
+                break;
+            case "toggledPublic":
+                Debug.Log("Toggled public");
+                TogglePrivateMessage togglePrivateMessage = wsMessage.data.ToObject<TogglePrivateMessage>();
+                LobbyStateManager.Instance.HandleTogglePublic(togglePrivateMessage.isPrivate);
                 break;
         }
 
@@ -214,4 +261,30 @@ public class BuildingMessage
 public class GameOverMessage
 {
     public string targetSide;
+}
+
+[System.Serializable]
+public class ConnectedToLobbyMessage
+{
+    public Lobby lobby;
+    public string side;
+}
+
+[System.Serializable]
+public class SelectedCountryMessage
+{
+    public int countryId;
+}
+
+[System.Serializable]
+public class ToggledReadyMessage
+{
+    public int side;
+    public bool ready;
+}
+
+[System.Serializable]
+public class TogglePrivateMessage
+{
+    public bool isPrivate;
 }

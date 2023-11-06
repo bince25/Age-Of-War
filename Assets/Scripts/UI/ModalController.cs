@@ -12,6 +12,26 @@ public class ModalController : MonoBehaviour
     public Button okButton;
     public Button cancelButton;
 
+    public static ModalController Instance { get; private set; }
+
+    void Awake()
+    {
+
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // Destroy the duplicate
+            Destroy(gameObject);
+        }
+
+        // Disable the modal so it doesn't show up initially
+        modalPanel.SetActive(false);
+    }
+
     void Start()
     {
         // Initially hide the modal

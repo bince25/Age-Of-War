@@ -18,26 +18,29 @@ public class MainMenuManager : MonoBehaviour
 
     public UIManager uiManager;
 
-    private Stack<GameState> stateHistory = new Stack<GameState>();
-    private GameState currentState;
+    private Stack<GameStateEnum> stateHistory = new Stack<GameStateEnum>();
+    private GameStateEnum currentState;
+    [SerializeField]
+    private GameObject returnButton;
 
     private void Awake()
     {
         modalController = modalControllerObject.GetComponent<ModalController>();
-        ChangeState(GameState.Login);
+        ChangeState(GameStateEnum.Login);
     }
 
     // Method to change state with history tracking
-    public void ChangeState(GameState newState, bool storeCurrentState = true)
+    public void ChangeState(GameStateEnum newState, bool storeCurrentState = true)
     {
         if (storeCurrentState)
         {
-            if (currentState != GameState.Login)
+            if (currentState != GameStateEnum.Login)
                 stateHistory.Push(currentState);
         }
 
         currentState = newState;
         UpdateUIBasedOnState();
+        CheckStateHistory();
     }
 
     // Method to revert to the previous state
@@ -45,9 +48,21 @@ public class MainMenuManager : MonoBehaviour
     {
         if (stateHistory.Count > 0)
         {
-            GameState previousState = stateHistory.Pop();
+            GameStateEnum previousState = stateHistory.Pop();
             // Don't store the current state since we are popping off the stack
             ChangeState(previousState, storeCurrentState: false);
+        }
+    }
+
+    public void CheckStateHistory()
+    {
+        if (stateHistory.Count > 0)
+        {
+            returnButton.SetActive(true);
+        }
+        else
+        {
+            returnButton.SetActive(false);
         }
     }
 
@@ -58,14 +73,20 @@ public class MainMenuManager : MonoBehaviour
         // Open the appropriate panel
         switch (currentState)
         {
-            case GameState.Login:
+            case GameStateEnum.Login:
                 uiManager.ShowPanel(uiManager.loginPanel);
                 break;
-            case GameState.MainMenu:
+            case GameStateEnum.MainMenu:
                 uiManager.ShowPanel(uiManager.mainMenuPanel);
                 break;
-            case GameState.GameModeSelect:
+            case GameStateEnum.GameModeSelect:
                 uiManager.ShowPanel(uiManager.gameModePanel);
+                break;
+            case GameStateEnum.JoinGame:
+                uiManager.ShowPanel(uiManager.joinGamePanel);
+                break;
+            case GameStateEnum.Lobby:
+                LobbyStateManager.Instance.ConnectToLobby();
                 break;
         }
     }
@@ -76,7 +97,7 @@ public class MainMenuManager : MonoBehaviour
         AuthManager.Instance.LogInWithUsernamePassword(mail.text, password.text, () =>
         {
             Debug.Log("Logged in successfully!");
-            ChangeState(GameState.MainMenu);
+            ChangeState(GameStateEnum.MainMenu);
         }, () =>
         {
             Debug.LogError("Login failed!");
@@ -86,14 +107,33 @@ public class MainMenuManager : MonoBehaviour
 
     public void SelectGameMode()
     {
-        ChangeState(GameState.GameModeSelect);
+        ChangeState(GameStateEnum.GameModeSelect);
     }
 
-    public void JoinGame()
+    public void JoinGameScreen()
     {
-        ChangeState(GameState.JoinGame);
+        ChangeState(GameStateEnum.JoinGame);
     }
 
+    public void FindGame()
+    {
+        LobbyStateManager.Instance.FindGame(() =>
+        {
+            Debug.Log("Found game!");
+            loadingScreen.HideLoadingPanel();
+            ChangeState(GameStateEnum.Lobby);
+        });
+    }
+
+    public void JoinGameWithInvitationCode()
+    {
+        LobbyStateManager.Instance.JoinGameWithInvitationCode(() =>
+        {
+            Debug.Log("Found game!");
+            loadingScreen.HideLoadingPanel();
+            ChangeState(GameStateEnum.Lobby);
+        });
+    }
     public void OpenCountriesPanel()
     {
         countriesPanel.SetActive(true);

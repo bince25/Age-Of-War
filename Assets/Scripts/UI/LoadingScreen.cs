@@ -6,15 +6,31 @@ using UnityEngine.UI;
 
 public class LoadingScreen : MonoBehaviour
 {
+    // Singleton pattern
+    public static LoadingScreen Instance { get; private set; }
+
+    private void Awake()
+    {
+        // Singleton pattern
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // Destroy the duplicate
+            Destroy(gameObject);
+        }
+
+        HideLoadingPanel();
+        progressBar.gameObject.SetActive(false);
+    }
+
     public GameObject loadingPanel;
     public Slider progressBar;
     public TMP_Text loadingText;
 
-    private void Awake()
-    {
-        HideLoadingPanel();
-        progressBar.gameObject.SetActive(false);
-    }
 
     // Call this method to load a scene
     public void LoadScene(string sceneName)

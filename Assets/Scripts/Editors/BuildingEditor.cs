@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(Building))]
+[CustomEditor(typeof(BuildingController))]
 public class BuildingEditor : Editor
 {
     SerializedProperty isFarm;

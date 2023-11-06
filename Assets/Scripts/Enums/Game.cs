@@ -4,7 +4,7 @@ public enum GameMode
     Online
 }
 
-public enum GameState
+public enum GameStateEnum
 {
     Login,
     MainMenu,

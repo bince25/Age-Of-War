@@ -29,7 +29,7 @@ public class OnlineGameStrategy : IGameStrategy
         if (target == null || !target.activeInHierarchy || attacker.currentHealth <= 0) return; // Check if target is available and if the unit's health is above zero
 
         UnitController targetController = target.GetComponent<UnitController>();
-        Castle castle = target.GetComponent<Castle>();
+        CastleController castle = target.GetComponent<CastleController>();
         if (targetController != null)
         {
             AttackMessage message = new AttackMessage
@@ -87,7 +87,7 @@ public class OnlineGameStrategy : IGameStrategy
         return;
     }
 
-    public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, Building building)
+    public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, BuildingController building)
     {
         BuildingLevelUpMessage message = new BuildingLevelUpMessage
         {
@@ -105,7 +105,7 @@ public class OnlineGameStrategy : IGameStrategy
         return;
     }
 
-    public void HandleBuildingCreation(Building building)
+    public void HandleBuildingCreation(BuildingController building)
     {
         BuildingCreationMessage message = new BuildingCreationMessage
         {

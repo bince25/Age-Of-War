@@ -33,7 +33,7 @@ public class LocalGameStrategy : IGameStrategy
         if (target == null || !target.activeInHierarchy || attacker.currentHealth <= 0) return; // Check if target is available and if the unit's health is above zero
 
         UnitController targetController = target.GetComponent<UnitController>();
-        Castle castle = target.GetComponent<Castle>();
+        CastleController castle = target.GetComponent<CastleController>();
         if (targetController != null)
         {
             targetController.TakeDamage(attacker.attackDamage);
@@ -49,7 +49,7 @@ public class LocalGameStrategy : IGameStrategy
         projectile.GetComponent<Projectile>().Seek(turret.target);
     }
 
-    public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, Building building)
+    public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, BuildingController building)
     {
         Debug.Log(building.buildingType + " Leveled Up!");
         if (building.buildingType == BuildingType.Farm)
@@ -149,7 +149,7 @@ public class LocalGameStrategy : IGameStrategy
         }
     }
 
-    public void HandleBuildingCreation(Building building)
+    public void HandleBuildingCreation(BuildingController building)
     {
         building.HandleLevelUp();
     }
