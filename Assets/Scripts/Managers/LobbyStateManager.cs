@@ -33,6 +33,8 @@ public class LobbyStateManager : MonoBehaviour
 
     public TMP_InputField invitationCodeInput;
 
+    public Side side;
+
     private void Awake()
     {
         if (Instance == null)
@@ -200,6 +202,33 @@ public class LobbyStateManager : MonoBehaviour
         rightReadyButton.GetComponentInChildren<TMP_Text>().text = opponentReady ? "Unready" : "Ready";
     }
 
+    public void LeaveLobby()
+    {
+
+        LeaveLobbyMessage leaveLobby = new LeaveLobbyMessage
+        {
+            action = "leaveLobby",
+            data = new LeaveLobbyData
+            {
+                lobbyId = lobbyId
+            },
+            token = PlayerPrefs.GetString("accessToken")
+        };
+
+        string jsonMessage = JsonConvert.SerializeObject(leaveLobby);
+        WebSocketClient.Instance.SendWebSocketMessage(jsonMessage);
+
+    }
+    public void HandleLeaveLobby(Side playerSide)
+    {
+        if (side == playerSide)
+        {
+            lobby = null;
+            UIManager.Instance.lobbyPanel.SetActive(false);
+        }
+
+    }
+
     public void JoinGameWithInvitationCode(Action onSuccess)
     {
         string invitationCode = invitationCodeInput.text;
@@ -236,6 +265,8 @@ public class LobbyStateManager : MonoBehaviour
                 ModalController.Instance.ShowModal("Error", error);
             });
     }
+
+
 }
 
 [System.Serializable]
@@ -324,4 +355,18 @@ public class JoinLobbyInviteMessage
 public class JoinLobbyInviteData
 {
     public string invitationCode;
+}
+
+[System.Serializable]
+public class LeaveLobbyMessage
+{
+    public string action;
+    public LeaveLobbyData data;
+    public string token;
+}
+
+[System.Serializable]
+public class LeaveLobbyData
+{
+    public string lobbyId;
 }

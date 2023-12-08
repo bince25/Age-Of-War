@@ -15,7 +15,7 @@ public class GameStateManager : MonoBehaviour
     [SerializeField]
     public Ages leftAge, rightAge;
 
-    public SpawnSide playerSide = SpawnSide.Left;
+    public Side playerSide = Side.Left;
 
     public static GameStateManager Instance { get; private set; }
 

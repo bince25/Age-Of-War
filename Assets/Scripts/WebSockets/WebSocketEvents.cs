@@ -144,10 +144,10 @@ public class WebSocketEvents : MonoBehaviour
         {
             case "connectedToLobby":
                 Debug.Log("Connected to Lobby");
-                Debug.Log(wsMessage.data);
                 ConnectedToLobbyMessage response = wsMessage.data.ToObject<ConnectedToLobbyMessage>();
                 LobbyStateManager.Instance.lobby = response.lobby;
                 LobbyStateManager.Instance.invitationCodeText.text = response.lobby.invitationCode;
+                LobbyStateManager.Instance.side = response.side == "Left" ? Side.Left : Side.Right;
                 LoadingScreen.Instance.HideLoadingPanel();
                 UIManager.Instance.ShowPanel(UIManager.Instance.lobbyPanel);
                 break;
@@ -174,6 +174,11 @@ public class WebSocketEvents : MonoBehaviour
                 Debug.Log("Toggled public");
                 TogglePrivateMessage togglePrivateMessage = wsMessage.data.ToObject<TogglePrivateMessage>();
                 LobbyStateManager.Instance.HandleTogglePublic(togglePrivateMessage.isPrivate);
+                break;
+            case "leftLobby":
+                Debug.Log("Left lobby");
+                LeftLobbyMessage leftLobbyMessage = wsMessage.data.ToObject<LeftLobbyMessage>();
+                LobbyStateManager.Instance.HandleLeaveLobby((Side)leftLobbyMessage.side);
                 break;
         }
 
@@ -287,4 +292,10 @@ public class ToggledReadyMessage
 public class TogglePrivateMessage
 {
     public bool isPrivate;
+}
+
+[Serializable]
+public class LeftLobbyMessage
+{
+    public int side;
 }
