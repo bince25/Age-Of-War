@@ -2,13 +2,15 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using Mirror;
 
-public class BuildingController : MonoBehaviour
+public class BuildingController : NetworkBehaviour
 {
     public BuildingType buildingType;
     private ResourceController resourceController;
     private UnitSpawner unitSpawner;
 
+    [SyncVar]
     public bool built = false;
 
     public bool isBarrack;
@@ -18,6 +20,8 @@ public class BuildingController : MonoBehaviour
 
     [Header("Farm")]
     private Coroutine farmCoroutine;
+
+    [SyncVar]
     public int farmLevel;
     public int goldIncrement;
     public float incrementCooldown;
@@ -26,12 +30,15 @@ public class BuildingController : MonoBehaviour
     public int foodIncrement;
 
     [Header("Barrack")]
+    [SyncVar]
     public int barrackLevel;
 
     [Header("Stable")]
+    [SyncVar]
     public int stableLevel;
 
     [Header("Workshop")]
+    [SyncVar]
     public int workshopLevel;
 
     void Awake()
@@ -65,7 +72,7 @@ public class BuildingController : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    [ServerCallback]
     void Start()
     {
         gameObject.name = GUID.Generate().ToString();
@@ -85,6 +92,7 @@ public class BuildingController : MonoBehaviour
     }
 
     //------------------------------------------FARM----------------------------------------------------------
+    [Server]
     IEnumerator FarmCoroutine(float multiplier = 1, float foodMultiplier = 1)
     {
         while (true)
@@ -94,11 +102,13 @@ public class BuildingController : MonoBehaviour
             resourceController.IncreaseFood((int)(foodIncrement * foodMultiplier));
         }
     }
+    [Server]
     public void ChangeFarmMultiplier(float newMultiplier)
     {
         farmGoldMultiplier = newMultiplier;
         StartFarmFunction();
     }
+    [Server]
     void StartFarmFunction()
     {
         if (farmCoroutine != null)
@@ -112,16 +122,17 @@ public class BuildingController : MonoBehaviour
     }
 
     //--------------------------------------------------------------------------------------------------------
+    [Server]
     public void LevelUp()
     {
         if (!built)
         {
             built = true;
-            GameManager.Instance.CurrentStrategy.HandleBuildingCreation(this);
         }
-        else GameManager.Instance.CurrentStrategy.HandleBuildingLevelUp(unitSpawner, resourceController, this);
+        HandleLevelUp();
     }
 
+    [Server]
     public void HandleLevelUp()
     {
         if (buildingType == BuildingType.Farm)

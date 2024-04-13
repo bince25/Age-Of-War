@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
+using System.Collections;
 
-public class TurretSpawner : MonoBehaviour
+public class TurretSpawner : NetworkBehaviour
 {
     [SerializeField]
     private SpawnSide spawnSide;
@@ -22,6 +22,7 @@ public class TurretSpawner : MonoBehaviour
     {
         resourceController = GameObject.FindGameObjectWithTag("GameManager").GetComponent<ResourceController>();
         unitSpawner = GameObject.FindGameObjectWithTag("GameManager").GetComponent<UnitSpawner>();
+
         if (spawnSide == SpawnSide.Left)
         {
             spawnLocation = leftSpawnPoint.transform.position;
@@ -34,20 +35,35 @@ public class TurretSpawner : MonoBehaviour
 
     public void SpawnTurret()
     {
-        if (resourceController.gold >= resourceController.turretCost)
+        if (isServer) // Ensure this is run on the server
         {
-            resourceController.DecreaseGold(resourceController.turretCost);
-            StartCoroutine(SpawnTurretCoroutine());
+            if (resourceController.gold >= resourceController.turretCost)
+            {
+                resourceController.DecreaseGold(resourceController.turretCost);
+                StartCoroutine(SpawnTurretCoroutine());
+            }
+        }
+        else if (isClient && hasAuthority) // Client asks server to spawn
+        {
+            CmdSpawnTurret();
         }
     }
 
+    [Command]
+    void CmdSpawnTurret()
+    {
+        SpawnTurret(); // Call the original spawn method on the server
+    }
+
+    [Server]
     IEnumerator SpawnTurretCoroutine()
     {
         yield return new WaitForSeconds(5);
         GameObject turretSpawned = Instantiate(turretPrefab, spawnLocation, Quaternion.identity);
+        NetworkServer.Spawn(turretSpawned);
+
         if (spawnSide == SpawnSide.Left)
         {
-
             turretSpawned.GetComponent<Turret>().isFacingRight = true;
         }
         else

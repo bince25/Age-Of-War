@@ -81,7 +81,7 @@ public class WebSocketEvents : MonoBehaviour
                 break;
             case "castleAttacked":
                 Debug.Log("CastleController attacked");
-                GameManager.Instance.castlesDictionary[wsMessage.data["targetSide"].ToString()].TakeDamage((int)wsMessage.data["damage"]);
+                GameManager.Instance.castlesDictionary[wsMessage.data["targetSide"].ToString()].CmdTakeDamage((int)wsMessage.data["damage"]);
                 break;
             case "unitDied":
                 Debug.Log("Unit died");

@@ -1,22 +1,26 @@
 using UnityEngine;
+using Mirror;
 
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
     public float speed = 10f;  // Projectile speed
     public int damage = 10;   // Damage dealt on impact
 
+    [SyncVar]
+    private GameObject targetGameObject;  // Target enemy as GameObject to be synchronized over the network
     private Transform target;  // Target enemy
 
-    public void Seek(Transform _target)
+    public void Seek(GameObject _targetGameObject)
     {
-        target = _target;
+        targetGameObject = _targetGameObject;
+        target = _targetGameObject.transform;
     }
 
     void Update()
     {
         if (target == null)
         {
-            Destroy(gameObject);
+            NetworkServer.Destroy(gameObject);
             return;
         }
 
@@ -26,22 +30,23 @@ public class Projectile : MonoBehaviour
         if (direction.magnitude <= distanceThisFrame)
         {
             // Projectile reached the target
-            HitTarget();
+            CmdHitTarget(targetGameObject);
             return;
         }
 
         transform.Translate(direction.normalized * distanceThisFrame, Space.World);
     }
 
-    void HitTarget()
+    [Command]
+    void CmdHitTarget(GameObject targetGameObject)
     {
-        // Deal damage to the target
-        UnitController enemy = target.GetComponent<UnitController>();
+        // Deal damage to the target on the server
+        UnitController enemy = targetGameObject.GetComponent<UnitController>();
         if (enemy != null)
         {
-            enemy.TakeDamage(damage);
+            enemy.TakeDamage(damage);  // Assuming TakeDamage is a server-side method
         }
 
-        Destroy(gameObject);
+        NetworkServer.Destroy(gameObject);
     }
 }

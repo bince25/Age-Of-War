@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using Mirror;
 
-public class UnitSpawner : MonoBehaviour
+public class UnitSpawner : NetworkBehaviour
 {
     [SerializeField]
     public SpawnSide spawnSide;
@@ -69,9 +70,12 @@ public class UnitSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (unitQueue.Count > 0 && !isSpawning)
+        if (isServer) // Ensure the server handles the spawning logic
         {
-            SpawnNextUnitInQueue();
+            if (unitQueue.Count > 0 && !isSpawning)
+            {
+                SpawnNextUnitInQueue();
+            }
         }
     }
 

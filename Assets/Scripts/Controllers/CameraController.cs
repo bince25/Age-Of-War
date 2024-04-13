@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
     [SerializeField]
     private int Boundary = 50;
@@ -11,7 +10,7 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float maxSpeed = 20f;
     [SerializeField]
-    private float acceleration = 0.5f; // Adjust this value to increase/decrease the acceleration rate
+    private float acceleration = 0.5f;
     [SerializeField]
     private int edgesPosition = 9;
 
@@ -22,6 +21,12 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+        if (!isLocalPlayer) // Ensure this script only runs for the local player's camera
+        {
+            enabled = false;
+            return;
+        }
+
         theScreenWidth = Screen.width;
         theScreenHeight = Screen.height;
         currentSpeed = initialSpeed;
@@ -29,6 +34,9 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        if (!isLocalPlayer)
+            return;
+
         bool movingRight = (Input.mousePosition.x > theScreenWidth - Boundary || Input.GetKey(KeyCode.RightArrow));
         bool movingLeft = (Input.mousePosition.x < 0 + Boundary || Input.GetKey(KeyCode.LeftArrow));
 

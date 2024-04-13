@@ -1,7 +1,8 @@
+using Mirror;
 using UnityEditor;
 using UnityEngine;
 
-public class Turret : MonoBehaviour
+public class Turret : NetworkBehaviour
 {
 
     [SerializeField]
@@ -31,6 +32,8 @@ public class Turret : MonoBehaviour
     }
     void Update()
     {
+        if (!isServer) return;
+
         if (target == null)
         {
             FindClosestEnemy();
@@ -66,25 +69,30 @@ public class Turret : MonoBehaviour
         }
     }
 
+    [Server]
     void Shoot()
     {
         GameManager.Instance.CurrentStrategy.HandleProjectileSpawn(this, projectilePrefab);
         // Set projectile properties (e.g., damage, speed, etc.)
     }
 
+    [Server]
     public void ShootById(string unitId)
     {
         UnitController enemyUnit = GameManager.Instance.unitsDictionary[unitId];
         GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-        projectile.GetComponent<Projectile>().Seek(enemyUnit.transform);
+        projectile.GetComponent<Projectile>().Seek(enemyUnit.transform.gameObject);
     }
 
+    [Server]
     public GameObject InstantiateProjectile(GameObject projectilePrefab, Vector3 position, Quaternion rotation)
     {
         GameObject projectile = Instantiate(projectilePrefab, position, rotation);
+        NetworkServer.Spawn(projectile); // Spawn the projectile for all clients
         return projectile;
     }
 
+    [Server]
     void FindClosestEnemy()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(oppositeTag);

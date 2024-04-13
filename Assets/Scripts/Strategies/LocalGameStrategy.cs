@@ -36,17 +36,17 @@ public class LocalGameStrategy : IGameStrategy
         CastleController castle = target.GetComponent<CastleController>();
         if (targetController != null)
         {
-            targetController.TakeDamage(attacker.attackDamage);
+            targetController.CmdTakeDamage(attacker.attackDamage);
         }
         else if (castle != null)
         {
-            castle.TakeDamage(attacker.attackDamage);
+            castle.CmdTakeDamage(attacker.attackDamage);
         }
     }
     public void HandleProjectileSpawn(Turret turret, GameObject entityPrefab)
     {
         GameObject projectile = turret.InstantiateProjectile(entityPrefab, turret.firePoint.position, turret.firePoint.rotation);
-        projectile.GetComponent<Projectile>().Seek(turret.target);
+        projectile.GetComponent<Projectile>().Seek(turret.target.gameObject);
     }
 
     public void HandleBuildingLevelUp(UnitSpawner unitSpawner, ResourceController resourceController, BuildingController building)
